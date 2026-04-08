@@ -78,7 +78,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: radial-gradient(circle at center, rgba(0, 30, 40, 0.6) 0%, rgba(0, 0, 0, 0.8) 60%, rgba(0, 0, 0, 0.95) 100%);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -87,12 +88,18 @@
             z-index: 10;
         }
 
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
+            50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #00ffff; transform: scale(1.02); }
+            100% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
+        }
+
         h1 {
             font-size: 4rem;
             margin: 0 0 10px 0;
             color: #fff;
-            text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff;
             text-align: center;
+            animation: pulseGlow 3s ease-in-out infinite;
         }
 
         p {
@@ -355,7 +362,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: #050505;
+            background: radial-gradient(circle at center, rgba(0, 30, 40, 0.6) 0%, rgba(0, 0, 0, 0.8) 60%, rgba(0, 0, 0, 0.95) 100%);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -437,10 +445,10 @@
     <div id="overlay">
         <h1 id="title-text">SPACE WARS</h1>
         <p id="instructions">
-            WASD / Arrows to Move <br>
-            Mouse to Aim <br>
-            Left Click to Shoot <br>
-            Spacebar to Use Bomb <br>
+            WASD / L-Stick to Move <br>
+            Mouse / R-Stick to Aim <br>
+            Left Click / RT to Shoot <br>
+            Spacebar / LT to Use Bomb <br>
         </p>
 
         <div id="game-over-submit" class="hidden">
@@ -470,6 +478,7 @@
         <label><input type="checkbox" id="chk-shake" checked> Enable Screen Shake</label>
         <label><input type="checkbox" id="chk-grid" checked> Show Background Grid</label>
         <label><input type="checkbox" id="chk-particles" checked> High Particle Quality</label>
+        <label><input type="checkbox" id="chk-stars" checked> Show Starfield</label>
         <button id="change-pilot-btn" style="margin-top: 15px; padding: 10px 20px; font-size: 1rem; background: rgba(255,0,255,0.2); border: 2px solid #ff00ff; color: #fff; cursor: pointer; border-radius: 5px; width: 100%; box-shadow: 0 0 10px rgba(255,0,255,0.3);">CHANGE PILOT NAME</button>
         <button id="close-settings-btn" class="close-btn">CLOSE</button>
     </div>
@@ -519,12 +528,20 @@
                 <button id="btn-ghost">Toggle Ghost Mode</button>
                 <button id="btn-teleport">Toggle Right-Click Teleport</button>
                 <button id="btn-magnet">Toggle Global Magnet</button>
+                <button id="btn-forcefield">Toggle Forcefield</button>
+                <button id="btn-orbiters">Toggle Orbiting Orbs</button>
+                <button id="btn-allied-drone">Toggle Allied Drone</button>
+                <button id="btn-firetrail">Toggle Trail of Fire</button>
+                <button id="btn-bouncyship">Toggle Bouncy Ship</button>
+                <button id="btn-clones">Toggle Mirror Clones</button>
             </div>
             
             <div id="tab-weapons" class="tab-content">
                 <button id="btn-admingun">Toggle Admin Gun</button>
                 <button id="btn-autofire">Toggle Auto-Fire</button>
                 <button id="btn-machinegun">Toggle Machine Gun</button>
+                <button id="btn-shotgun">Toggle Shotgun Mode</button>
+                <button id="btn-spiralfire">Toggle Spiral Fire</button>
                 <button id="btn-giantbullets">Toggle Giant Bullets</button>
                 <button id="btn-piercing">Toggle Piercing Bullets</button>
                 <button id="btn-homing">Toggle Homing Bullets</button>
@@ -532,23 +549,36 @@
                 <button id="btn-explosive">Toggle Explosive Bullets</button>
                 <button id="btn-instakill">Toggle Insta-Kill</button>
                 <button id="btn-norecoil">Toggle No Recoil</button>
+                <button id="btn-boomerang">Toggle Boomerang Bullets</button>
+                <button id="btn-rearblasters">Toggle Rear Blasters</button>
+                <button id="btn-flamethrower">Toggle Flamethrower</button>
+                <button id="btn-starburst">Toggle Starburst Attack</button>
             </div>
 
             <div id="tab-score" class="tab-content">
                 <button id="btn-addscore">+10,000 Score</button>
+                <button id="btn-jackpot">Jackpot (+1M Score)</button>
                 <button id="btn-multiplier">+10x Multiplier</button>
                 <button id="btn-collectgeoms">Collect All Geoms</button>
                 <button id="btn-rain">Make It Rain Geoms</button>
                 <button id="btn-nuke">Nuke Screen (Yields Score)</button>
+                <button id="btn-maxgeoms">Spawn Max Geoms</button>
             </div>
 
             <div id="tab-world" class="tab-content">
                 <button id="btn-freeze">Toggle Freeze Enemies</button>
                 <button id="btn-slowmo">Toggle Slow Motion</button>
+                <button id="btn-hyperspeed">Toggle Hyper Speed</button>
+                <button id="btn-shrink">Toggle Shrink Enemies</button>
+                <button id="btn-giantenemies">Toggle Giant Enemies</button>
                 <button id="btn-swarm">Spawn Swarm</button>
                 <button id="btn-brutes">Spawn Brute Squad</button>
                 <button id="btn-mothership">Spawn Mothership</button>
+                <button id="btn-boss-swarm">Spawn Boss Swarm</button>
                 <button id="btn-blackhole">Toggle Black Hole</button>
+                <button id="btn-disco">Toggle Disco Mode</button>
+                <button id="btn-maxdifficulty">Max Difficulty (+5.0)</button>
+                <button id="btn-superhot">Toggle SUPERHOT Mode</button>
             </div>
         </div>
     </div>
@@ -589,6 +619,7 @@
     const chkShake = document.getElementById('chk-shake');
     const chkGrid = document.getElementById('chk-grid');
     const chkParticles = document.getElementById('chk-particles');
+    const chkStars = document.getElementById('chk-stars');
     const changePilotBtn = document.getElementById('change-pilot-btn');
 
     // Cheat / Admin Elements
@@ -627,6 +658,27 @@
     const btnTeleport = document.getElementById('btn-teleport');
     const btnBlackHole = document.getElementById('btn-blackhole');
     const btnMothership = document.getElementById('btn-mothership');
+    const btnForcefield = document.getElementById('btn-forcefield');
+    const btnBoomerang = document.getElementById('btn-boomerang');
+    const btnMaxGeoms = document.getElementById('btn-maxgeoms');
+    const btnDisco = document.getElementById('btn-disco');
+    const btnOrbiters = document.getElementById('btn-orbiters');
+    const btnShotgun = document.getElementById('btn-shotgun');
+    const btnShrink = document.getElementById('btn-shrink');
+    const btnBossSwarm = document.getElementById('btn-boss-swarm');
+    const btnAlliedDrone = document.getElementById('btn-allied-drone');
+    const btnSpiralFire = document.getElementById('btn-spiralfire');
+    const btnJackpot = document.getElementById('btn-jackpot');
+    const btnHyperSpeed = document.getElementById('btn-hyperspeed');
+    const btnFireTrail = document.getElementById('btn-firetrail');
+    const btnBouncyShip = document.getElementById('btn-bouncyship');
+    const btnRearBlasters = document.getElementById('btn-rearblasters');
+    const btnMaxDifficulty = document.getElementById('btn-maxdifficulty');
+    const btnGiantEnemies = document.getElementById('btn-giantenemies');
+    const btnClones = document.getElementById('btn-clones');
+    const btnFlamethrower = document.getElementById('btn-flamethrower');
+    const btnStarburst = document.getElementById('btn-starburst');
+    const btnSuperhot = document.getElementById('btn-superhot');
 
     // Auth UI Elements
     const authOverlay = document.getElementById('auth-overlay');
@@ -641,11 +693,31 @@
     let settingScreenShake = true;
     let settingShowGrid = true;
     let settingHighParticles = true;
+    let settingShowStars = true;
 
     // Setup Canvas Size
     let width, height;
     const gridCanvas = document.createElement('canvas');
     const gridCtx = gridCanvas.getContext('2d');
+
+    // Starfield Background
+    const stars = [];
+    const NUM_STARS = 150;
+
+    function initStars() {
+        stars.length = 0;
+        const colors = ['#ffffff', '#aaddff', '#ffccff', '#ccffff'];
+        for (let i = 0; i < NUM_STARS; i++) {
+            stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                size: Math.random() * 1.5 + 0.5,
+                speed: Math.random() * 0.5 + 0.1,
+                depth: Math.random(), // 0 to 1 for parallax
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+    }
 
     function resize() {
         // Ensure width and height are never 0 to prevent drawImage errors
@@ -653,6 +725,8 @@
         height = Math.max(1, window.innerHeight);
         canvas.width = width;
         canvas.height = height;
+
+        initStars(); // Re-initialize stars to fill the new screen bounds
 
         // Pre-render the grid background to save performance
         gridCanvas.width = width;
@@ -880,6 +954,23 @@
     let isNoRecoil = false;
     let isClickTeleport = false;
     let isBlackHole = false;
+    let isForcefield = false;
+    let isBoomerang = false;
+    let isDiscoMode = false;
+    let isOrbiters = false;
+    let isShotgun = false;
+    let isShrinkEnemies = false;
+    let isAlliedDrone = false;
+    let isSpiralFire = false;
+    let isHyperSpeed = false;
+    let isFireTrail = false;
+    let isBouncyShip = false;
+    let isRearBlasters = false;
+    let isGiantEnemies = false;
+    let isMirrorClones = false;
+    let isFlamethrower = false;
+    let isStarburst = false;
+    let isSuperhotMode = false;
 
     // Entities
     let player;
@@ -895,6 +986,7 @@
         ' ': false
     };
     const mouse = { x: width/2, y: height/2, down: false };
+    let lastAimMode = 'mouse';
 
     // Prevent right click menu from popping up
     window.addEventListener('contextmenu', e => e.preventDefault());
@@ -916,6 +1008,7 @@
         }
     });
     window.addEventListener('mousemove', (e) => {
+        lastAimMode = 'mouse';
         mouse.x = e.clientX;
         mouse.y = e.clientY;
     });
@@ -947,6 +1040,7 @@
     chkShake.addEventListener('change', (e) => settingScreenShake = e.target.checked);
     chkGrid.addEventListener('change', (e) => settingShowGrid = e.target.checked);
     chkParticles.addEventListener('change', (e) => settingHighParticles = e.target.checked);
+    chkStars.addEventListener('change', (e) => settingShowStars = e.target.checked);
 
     changePilotBtn.addEventListener('click', () => {
         settingsModal.classList.add('hidden');
@@ -1031,6 +1125,23 @@
                 isNoRecoil = false;
                 isClickTeleport = false;
                 isBlackHole = false;
+                isForcefield = false;
+                isBoomerang = false;
+                isDiscoMode = false;
+                isOrbiters = false;
+                isShotgun = false;
+                isShrinkEnemies = false;
+                isAlliedDrone = false;
+                isSpiralFire = false;
+                isHyperSpeed = false;
+                isFireTrail = false;
+                isBouncyShip = false;
+                isRearBlasters = false;
+                isGiantEnemies = false;
+                isMirrorClones = false;
+                isFlamethrower = false;
+                isStarburst = false;
+                isSuperhotMode = false;
                 
                 // Reset active button visuals on the panel
                 document.querySelectorAll('#admin-panel button').forEach(btn => {
@@ -1240,6 +1351,126 @@
         }
     });
 
+    btnForcefield.addEventListener('click', () => {
+        isForcefield = !isForcefield;
+        toggleAdminBtn(btnForcefield, isForcefield);
+    });
+
+    btnBoomerang.addEventListener('click', () => {
+        isBoomerang = !isBoomerang;
+        toggleAdminBtn(btnBoomerang, isBoomerang);
+    });
+
+    btnMaxGeoms.addEventListener('click', () => {
+        if (!player) return;
+        for (let i = 0; i < 200; i++) {
+            geoms.push(new Geom(Math.random() * width, Math.random() * height));
+        }
+    });
+
+    btnDisco.addEventListener('click', () => {
+        isDiscoMode = !isDiscoMode;
+        toggleAdminBtn(btnDisco, isDiscoMode);
+    });
+
+    btnOrbiters.addEventListener('click', () => {
+        isOrbiters = !isOrbiters;
+        toggleAdminBtn(btnOrbiters, isOrbiters);
+    });
+
+    btnShotgun.addEventListener('click', () => {
+        isShotgun = !isShotgun;
+        toggleAdminBtn(btnShotgun, isShotgun);
+    });
+
+    btnShrink.addEventListener('click', () => {
+        isShrinkEnemies = !isShrinkEnemies;
+        toggleAdminBtn(btnShrink, isShrinkEnemies);
+    });
+
+    btnBossSwarm.addEventListener('click', () => {
+        if (state === 'PLAYING') {
+            for (let i = 0; i < 3; i++) {
+                let x = Math.random() < 0.5 ? -40 : width + 40;
+                let y = Math.random() * height;
+                enemies.push(new Enemy(x, y, 7)); // 7 is Mothership
+            }
+        }
+    });
+
+    btnAlliedDrone.addEventListener('click', () => {
+        isAlliedDrone = !isAlliedDrone;
+        toggleAdminBtn(btnAlliedDrone, isAlliedDrone);
+    });
+
+    btnSpiralFire.addEventListener('click', () => {
+        isSpiralFire = !isSpiralFire;
+        toggleAdminBtn(btnSpiralFire, isSpiralFire);
+    });
+
+    btnJackpot.addEventListener('click', () => {
+        score += 1000000;
+        multiplier = Math.max(multiplier, 100);
+        updateUI();
+        if (player) createExplosion(player.x, player.y, '#ffd700', 50); // Golden explosion
+    });
+
+    btnHyperSpeed.addEventListener('click', () => {
+        isHyperSpeed = !isHyperSpeed;
+        toggleAdminBtn(btnHyperSpeed, isHyperSpeed);
+    });
+
+    btnFireTrail.addEventListener('click', () => {
+        isFireTrail = !isFireTrail;
+        toggleAdminBtn(btnFireTrail, isFireTrail);
+    });
+
+    btnBouncyShip.addEventListener('click', () => {
+        isBouncyShip = !isBouncyShip;
+        toggleAdminBtn(btnBouncyShip, isBouncyShip);
+    });
+
+    btnRearBlasters.addEventListener('click', () => {
+        isRearBlasters = !isRearBlasters;
+        toggleAdminBtn(btnRearBlasters, isRearBlasters);
+    });
+
+    btnMaxDifficulty.addEventListener('click', () => {
+        difficulty += 5.0;
+        // Briefly flash the button to indicate it was clicked
+        btnMaxDifficulty.classList.add('admin-btn-active');
+        setTimeout(() => btnMaxDifficulty.classList.remove('admin-btn-active'), 200);
+    });
+
+    btnGiantEnemies.addEventListener('click', () => {
+        isGiantEnemies = !isGiantEnemies;
+        toggleAdminBtn(btnGiantEnemies, isGiantEnemies);
+        if (isGiantEnemies && isShrinkEnemies) {
+            isShrinkEnemies = false; // Disable shrink if giant is enabled
+            toggleAdminBtn(document.getElementById('btn-shrink'), false);
+        }
+    });
+
+    btnClones.addEventListener('click', () => {
+        isMirrorClones = !isMirrorClones;
+        toggleAdminBtn(btnClones, isMirrorClones);
+    });
+
+    btnFlamethrower.addEventListener('click', () => {
+        isFlamethrower = !isFlamethrower;
+        toggleAdminBtn(btnFlamethrower, isFlamethrower);
+    });
+
+    btnStarburst.addEventListener('click', () => {
+        isStarburst = !isStarburst;
+        toggleAdminBtn(btnStarburst, isStarburst);
+    });
+
+    btnSuperhot.addEventListener('click', () => {
+        isSuperhotMode = !isSuperhotMode;
+        toggleAdminBtn(btnSuperhot, isSuperhotMode);
+    });
+
     // --- CLASSES ---
 
     class Player {
@@ -1256,6 +1487,8 @@
             this.shootCooldown = 0;
             this.maxCooldown = 6;
             this.invulnerable = 120; // frames
+            this.prevBombPressed = false;
+            this.prevTeleportPressed = false;
         }
 
         update() {
@@ -1266,8 +1499,56 @@
             if (keys.a || keys.ArrowLeft) dx -= 1;
             if (keys.d || keys.ArrowRight) dx += 1;
 
-            if (dx !== 0 && dy !== 0) {
-                const len = Math.sqrt(dx*dx + dy*dy);
+            let isGamepadShooting = false;
+            let gp = navigator.getGamepads ? navigator.getGamepads()[0] : null;
+
+            if (gp) {
+                const deadzone = 0.2;
+                // Left Stick
+                if (Math.abs(gp.axes[0]) > deadzone) dx += gp.axes[0];
+                if (Math.abs(gp.axes[1]) > deadzone) dy += gp.axes[1];
+                // D-Pad
+                if (gp.buttons[14]?.pressed) dx -= 1; // Left
+                if (gp.buttons[15]?.pressed) dx += 1; // Right
+                if (gp.buttons[12]?.pressed) dy -= 1; // Up
+                if (gp.buttons[13]?.pressed) dy += 1; // Down
+
+                // Right Stick Aim
+                if (Math.abs(gp.axes[2]) > deadzone || Math.abs(gp.axes[3]) > deadzone) {
+                    lastAimMode = 'gamepad';
+                    this.angle = Math.atan2(gp.axes[3], gp.axes[2]);
+                }
+
+                // Shoot (RT or RB)
+                if (gp.buttons[7]?.pressed || gp.buttons[5]?.pressed) {
+                    isGamepadShooting = true;
+                }
+
+                // Bomb (LT or B Button)
+                if (gp.buttons[6]?.pressed || gp.buttons[1]?.pressed) {
+                    if (!this.prevBombPressed && state === 'PLAYING') useBomb();
+                    this.prevBombPressed = true;
+                } else {
+                    this.prevBombPressed = false;
+                }
+
+                // Teleport Cheat (LB or X Button)
+                if (isClickTeleport && (gp.buttons[4]?.pressed || gp.buttons[2]?.pressed)) {
+                    if (!this.prevTeleportPressed && state === 'PLAYING') {
+                        const teleportDist = 200;
+                        createExplosion(this.x, this.y, this.color, 15);
+                        this.x += Math.cos(this.angle) * teleportDist;
+                        this.y += Math.sin(this.angle) * teleportDist;
+                        createExplosion(this.x, this.y, '#ffffff', 15);
+                    }
+                    this.prevTeleportPressed = true;
+                } else {
+                    this.prevTeleportPressed = false;
+                }
+            }
+
+            const len = Math.sqrt(dx*dx + dy*dy);
+            if (len > 1) {
                 dx /= len; dy /= len;
             }
 
@@ -1284,55 +1565,166 @@
             this.y += this.vy;
 
             // Bounds
-            this.x = Math.max(this.radius, Math.min(width - this.radius, this.x));
-            this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
+            if (isBouncyShip) {
+                if (this.x < this.radius || this.x > width - this.radius) {
+                    this.vx *= -1;
+                    this.x = Math.max(this.radius, Math.min(width - this.radius, this.x));
+                }
+                if (this.y < this.radius || this.y > height - this.radius) {
+                    this.vy *= -1;
+                    this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
+                }
+            } else {
+                this.x = Math.max(this.radius, Math.min(width - this.radius, this.x));
+                this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
+            }
 
-            // Aiming
-            this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+            // Aiming (Fallback to Mouse if used recently)
+            if (lastAimMode === 'mouse') {
+                this.angle = Math.atan2(mouse.y - this.y, mouse.x - this.x);
+            }
 
             // Shooting
             if (this.shootCooldown > 0) this.shootCooldown--;
-            if ((mouse.down || isAutoFire) && this.shootCooldown <= 0) {
+            if ((mouse.down || isGamepadShooting || isAutoFire) && this.shootCooldown <= 0) {
                 this.shoot();
+            }
+
+            // Allied Drone Logic
+            if (isAlliedDrone && frame % 15 === 0 && enemies.length > 0) {
+                let nearest = null;
+                let minDist = Infinity;
+                const droneX = this.x + Math.cos(frame * 0.05) * 40;
+                const droneY = this.y + Math.sin(frame * 0.05) * 40;
+                
+                for (let i = 0; i < enemies.length; i++) {
+                    const e = enemies[i];
+                    const distSq = (e.x - droneX) * (e.x - droneX) + (e.y - droneY) * (e.y - droneY);
+                    if (distSq < minDist) {
+                        minDist = distSq;
+                        nearest = e;
+                    }
+                }
+                
+                if (nearest) {
+                    const dx = nearest.x - droneX;
+                    const dy = nearest.y - droneY;
+                    const ang = Math.atan2(dy, dx);
+                    let b = new Bullet(droneX, droneY, Math.cos(ang), Math.sin(ang));
+                    b.color = '#00ff00'; // Green drone bullet
+                    bullets.push(b);
+                }
+            }
+
+            if (isFireTrail && frame % 3 === 0) {
+                // Drop stationary fire "bullets" that act as mines
+                let trail = new Bullet(this.x, this.y, 0, 0);
+                trail.color = '#ff4400';
+                trail.radius = 12;
+                trail.life = 30;
+                bullets.push(trail);
             }
 
             if (this.invulnerable > 0) this.invulnerable--;
         }
 
         shoot() {
-            const bx = Math.cos(this.angle);
-            const by = Math.sin(this.angle);
-            
-            if (isAdminGunActive) {
-                // Admin Death Blossom: 8-Way Spread
-                for (let i = 0; i < 8; i++) {
-                    const a = this.angle + (i * Math.PI / 4);
-                    bullets.push(new Bullet(this.x + Math.cos(a) * 20, this.y + Math.sin(a) * 20, Math.cos(a), Math.sin(a)));
-                }
-            } else if (score < 10000) {
-                // Tier 1 (0 - 9,999): Standard Single Shot
-                bullets.push(new Bullet(this.x + bx * 20, this.y + by * 20, bx, by));
-            } else if (score >= 10000 && score < 20000) {
-                // Tier 2 (10,000 - 19,999): Twin Blasters
-                const perpX = -by; // Perpendicular angles for offset
-                const perpY = bx;
-                const offset = 8;
-                bullets.push(new Bullet(this.x + bx * 20 + perpX * offset, this.y + by * 20 + perpY * offset, bx, by));
-                bullets.push(new Bullet(this.x + bx * 20 - perpX * offset, this.y + by * 20 - perpY * offset, bx, by));
-            } else {
-                // Tier 3 (20,000+): Triple Spread Shot
-                bullets.push(new Bullet(this.x + bx * 20, this.y + by * 20, bx, by)); // Center
+            const fire = (ox, oy, oAngle) => {
+                const bx = Math.cos(oAngle);
+                const by = Math.sin(oAngle);
                 
-                const angle1 = this.angle - 0.25;
-                const angle2 = this.angle + 0.25;
-                bullets.push(new Bullet(this.x + Math.cos(angle1) * 20, this.y + Math.sin(angle1) * 20, Math.cos(angle1), Math.sin(angle1)));
-                bullets.push(new Bullet(this.x + Math.cos(angle2) * 20, this.y + Math.sin(angle2) * 20, Math.cos(angle2), Math.sin(angle2)));
+                if (isStarburst) {
+                    for (let i = 0; i < 36; i++) {
+                        const spAngle = i * (Math.PI / 18);
+                        bullets.push(new Bullet(ox, oy, Math.cos(spAngle), Math.sin(spAngle)));
+                    }
+                    return;
+                }
+
+                if (isFlamethrower) {
+                    for (let i = 0; i < 4; i++) {
+                        const spread = oAngle + (Math.random() - 0.5) * 0.8;
+                        let b = new Bullet(ox, oy, Math.cos(spread), Math.sin(spread));
+                        b.color = Math.random() > 0.5 ? '#ff4400' : '#ffaa00';
+                        b.life = 20 + Math.random() * 15;
+                        b.radius = 4 + Math.random() * 6;
+                        b.isFlame = true; // Flag for physics
+                        b.vx *= 0.6; // Slower start
+                        b.vy *= 0.6;
+                        bullets.push(b);
+                    }
+                    return;
+                }
+
+                if (isSpiralFire) {
+                    // Shoot an epic rotating 4-way spiral
+                    for (let i = 0; i < 4; i++) {
+                        const spAngle = (frame * 0.1) + (i * Math.PI / 2);
+                        bullets.push(new Bullet(ox, oy, Math.cos(spAngle), Math.sin(spAngle)));
+                    }
+                    return; // Override normal shooting logic
+                }
+                
+                if (isShotgun) {
+                    for (let i = -7; i <= 7; i++) {
+                        const spreadAngle = oAngle + (i * 0.08);
+                        bullets.push(new Bullet(ox, oy, Math.cos(spreadAngle), Math.sin(spreadAngle)));
+                    }
+                } else if (isAdminGunActive) {
+                    // Admin Death Blossom: 8-Way Spread
+                    for (let i = 0; i < 8; i++) {
+                        const a = oAngle + (i * Math.PI / 4);
+                        bullets.push(new Bullet(ox, oy, Math.cos(a), Math.sin(a)));
+                    }
+                } else if (score < 10000) {
+                    // Tier 1 (0 - 9,999): Standard Single Shot
+                    bullets.push(new Bullet(ox + bx * 20, oy + by * 20, bx, by));
+                } else if (score >= 10000 && score < 20000) {
+                    // Tier 2 (10,000 - 19,999): Twin Blasters
+                    const perpX = -by; // Perpendicular angles for offset
+                    const perpY = bx;
+                    const offset = 8;
+                    bullets.push(new Bullet(ox + bx * 20 + perpX * offset, oy + by * 20 + perpY * offset, bx, by));
+                    bullets.push(new Bullet(ox + bx * 20 - perpX * offset, oy + by * 20 - perpY * offset, bx, by));
+                } else {
+                    // Tier 3 (20,000+): Triple Spread Shot
+                    bullets.push(new Bullet(ox + bx * 20, oy + by * 20, bx, by)); // Center
+                    
+                    const angle1 = oAngle - 0.25;
+                    const angle2 = oAngle + 0.25;
+                    bullets.push(new Bullet(ox + Math.cos(angle1) * 20, oy + Math.sin(angle1) * 20, Math.cos(angle1), Math.sin(angle1)));
+                    bullets.push(new Bullet(ox + Math.cos(angle2) * 20, oy + Math.sin(angle2) * 20, Math.cos(angle2), Math.sin(angle2)));
+                }
+
+                if (isRearBlasters) {
+                    // Shoot backwards
+                    bullets.push(new Bullet(ox - bx * 20, oy - by * 20, -bx, -by));
+                }
+            };
+
+            // Fire main gun
+            fire(this.x, this.y, this.angle);
+
+            // Fire clone gun
+            if (isMirrorClones) {
+                fire(width - this.x, height - this.y, this.angle + Math.PI);
             }
 
-            this.shootCooldown = isMachineGun ? 1 : this.maxCooldown;
+            // Adjust cooldowns based on weapon
+            if (isFlamethrower || isMachineGun) {
+                this.shootCooldown = 2;
+            } else if (isSpiralFire) {
+                this.shootCooldown = 2;
+            } else if (isStarburst) {
+                this.shootCooldown = 15;
+            } else {
+                this.shootCooldown = this.maxCooldown;
+            }
             
             // Recoil
-            if (!isNoRecoil) {
+            if (!isNoRecoil && !isFlamethrower && !isStarburst) {
+                const bx = Math.cos(this.angle);
+                const by = Math.sin(this.angle);
                 const baseRecoil = 1.5;
                 this.vx -= bx * (isMachineGun ? (baseRecoil / 3) : baseRecoil);
                 this.vy -= by * (isMachineGun ? (baseRecoil / 3) : baseRecoil);
@@ -1342,6 +1734,42 @@
         draw(ctx) {
             ctx.save();
             ctx.translate(this.x, this.y);
+
+            // Orbiting Orbs
+            if (isOrbiters) {
+                const orbDist = 50;
+                for(let o = 0; o < 3; o++) {
+                    const oAngle = (frame * 0.08) + (o * Math.PI * 2 / 3);
+                    const ox = Math.cos(oAngle) * orbDist;
+                    const oy = Math.sin(oAngle) * orbDist;
+                    ctx.beginPath();
+                    ctx.arc(ox, oy, 6, 0, Math.PI*2);
+                    ctx.fillStyle = '#00ffcc';
+                    ctx.fill();
+                }
+            }
+
+            // Allied Drone Draw
+            if (isAlliedDrone) {
+                const orbitAngle = frame * 0.05;
+                const droneX = Math.cos(orbitAngle) * 40;
+                const droneY = Math.sin(orbitAngle) * 40;
+                ctx.save();
+                ctx.translate(droneX, droneY);
+                ctx.rotate(orbitAngle + Math.PI/2);
+                ctx.beginPath();
+                ctx.moveTo(0, -8);
+                ctx.lineTo(6, 6);
+                ctx.lineTo(-6, 6);
+                ctx.closePath();
+                ctx.fillStyle = '#00ff00';
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.restore();
+            }
+
             ctx.rotate(this.angle);
             
             if (isMiniShip) ctx.scale(0.4, 0.4);
@@ -1370,7 +1798,44 @@
             ctx.fillStyle = '#ffffff';
             ctx.fill();
 
+            if (isForcefield) {
+                ctx.beginPath();
+                ctx.arc(0, 0, 45, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 255, 0.15)';
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.6)';
+                ctx.setLineDash([5, 5]);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
             ctx.restore();
+
+            if (isMirrorClones) {
+                ctx.save();
+                ctx.translate(width - this.x, height - this.y);
+                ctx.rotate(this.angle + Math.PI);
+                
+                if (isMiniShip) ctx.scale(0.4, 0.4);
+                ctx.globalAlpha = 0.5;
+
+                ctx.beginPath();
+                ctx.moveTo(15, 0);
+                ctx.lineTo(-10, 10);
+                ctx.lineTo(-5, 0);
+                ctx.lineTo(-10, -10);
+                ctx.closePath();
+                ctx.strokeStyle = drawColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(-2, 0, 3, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+
+                ctx.restore();
+            }
         }
     }
 
@@ -1384,9 +1849,10 @@
             this.radius = isGiantBullets ? 15 : 2;
             this.color = isGiantBullets ? '#ffff00' : '#fff';
             this.life = 100;
+            this.isFlame = false;
         }
 
-        update() {
+        update(timeScale = 1.0) {
             if (isHoming && enemies.length > 0) {
                 let nearest = null;
                 let minDist = Infinity;
@@ -1415,9 +1881,19 @@
                 this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
             }
 
-            this.x += this.vx;
-            this.y += this.vy;
-            this.life--;
+            if (isBoomerang && this.life === 50) {
+                this.vx *= -1;
+                this.vy *= -1;
+            }
+
+            if (this.isFlame) {
+                this.vx *= Math.pow(0.92, timeScale);
+                this.vy *= Math.pow(0.92, timeScale);
+            }
+
+            this.x += this.vx * timeScale;
+            this.y += this.vy * timeScale;
+            this.life -= timeScale;
         }
 
         draw(ctx) {
@@ -1516,7 +1992,17 @@
             }
         }
 
-        update() {
+        update(timeScale = 1.0) {
+            this.radius = isGiantEnemies ? this.baseRadius * 2.5 : (isShrinkEnemies ? this.baseRadius * 0.5 : this.baseRadius);
+            if (isGiantEnemies && !this.isGiantBuffed) {
+                this.hp *= 5;
+                this.isGiantBuffed = true;
+            }
+            if (isShrinkEnemies && this.hp > 1) {
+                this.hp = 1;
+                this.isGiantBuffed = false; // Reset buff state if shrunk
+            }
+
             if (isBlackHole) {
                 const centerX = width / 2;
                 const centerY = height / 2;
@@ -1557,15 +2043,15 @@
             } else if (this.type === 1 || this.type === 4 || this.type === 5) {
                 if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
                 if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
-                if (this.type === 1) this.angle += 0.05;
+                if (this.type === 1) this.angle += 0.05 * timeScale;
                 if (this.type === 4) this.angle = Math.atan2(this.vy, this.vx);
                 if (this.type === 5) {
-                    this.pulseFrame += 0.1;
-                    this.radius = this.baseRadius + Math.sin(this.pulseFrame) * 10;
-                    this.angle += 0.02;
+                    this.pulseFrame += 0.1 * timeScale;
+                    this.radius = this.baseRadius + Math.sin(this.pulseFrame) * (isShrinkEnemies ? 5 : 10);
+                    this.angle += 0.02 * timeScale;
                 }
             } else if (this.type === 2) {
-                this.evadeTimer++;
+                this.evadeTimer += timeScale;
                 const dx = targetX - this.x;
                 const dy = targetY - this.y;
                 let targetAngle = Math.atan2(dy, dx);
@@ -1577,11 +2063,11 @@
                 let angleDiff = targetAngle - this.angle;
                 while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
                 while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-                this.angle += angleDiff * 0.1;
+                this.angle += angleDiff * 0.1 * timeScale;
                 this.vx = Math.cos(this.angle) * this.speed;
                 this.vy = Math.sin(this.angle) * this.speed;
             } else if (this.type === 6) {
-                this.dashTimer++;
+                this.dashTimer += timeScale;
                 if (this.dashTimer > 60) {
                     const dx = targetX - this.x;
                     const dy = targetY - this.y;
@@ -1608,12 +2094,12 @@
                     this.vx *= 0.95;
                     this.vy *= 0.95;
                 }
-                this.angle += 0.02;
-                if (frame % 90 === 0) {
+                this.angle += 0.02 * timeScale;
+                if (Math.floor(frame) % 90 === 0) {
                     enemies.push(new Enemy(this.x, this.y, 0)); 
                 }
             } else if (this.type === 8) {
-                this.jumpTimer++;
+                this.jumpTimer += timeScale;
                 const dx = targetX - this.x;
                 const dy = targetY - this.y;
                 const dist = Math.sqrt(dx*dx + dy*dy) || 1;
@@ -1634,11 +2120,11 @@
                 const dx = targetX - this.x;
                 const dy = targetY - this.y;
                 let targetAngle = Math.atan2(dy, dx);
-                this.waveTimer += 0.15;
+                this.waveTimer += 0.15 * timeScale;
                 let angleDiff = targetAngle - this.angle;
                 while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
                 while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-                this.angle += angleDiff * 0.05;
+                this.angle += angleDiff * 0.05 * timeScale;
                 const bx = Math.cos(this.angle) * this.speed;
                 const by = Math.sin(this.angle) * this.speed;
                 const px = Math.cos(this.angle + Math.PI/2) * Math.sin(this.waveTimer) * 4;
@@ -1654,7 +2140,7 @@
                     this.vx = (dx / dist) * this.speed;
                     this.vy = (dy / dist) * this.speed;
                 }
-                this.angle += 0.03;
+                this.angle += 0.03 * timeScale;
             }
 
             if (player && isRepellent) {
@@ -1663,14 +2149,14 @@
                 const rDistSq = rdx*rdx + rdy*rdy;
                 if (rDistSq < 40000) {
                     const rDist = Math.sqrt(rDistSq) || 1;
-                    this.x += (rdx / rDist) * 5;
-                    this.y += (rdy / rDist) * 5;
+                    this.x += (rdx / rDist) * 5 * timeScale;
+                    this.y += (rdy / rDist) * 5 * timeScale;
                 }
             }
 
-            const speedMod = isSlowMo ? 0.25 : 1;
-            this.x += this.vx * speedMod;
-            this.y += this.vy * speedMod;
+            const speedMod = isSlowMo ? 0.25 : (isHyperSpeed ? 2.5 : 1);
+            this.x += this.vx * speedMod * timeScale;
+            this.y += this.vy * speedMod * timeScale;
         }
 
         draw(ctx) {
@@ -1678,7 +2164,13 @@
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
 
-            ctx.strokeStyle = this.color;
+            if (isGiantEnemies) {
+                ctx.scale(2.5, 2.5);
+            } else if (isShrinkEnemies) {
+                ctx.scale(0.5, 0.5);
+            }
+
+            ctx.strokeStyle = isDiscoMode ? `hsl(${frame % 360}, 100%, 50%)` : this.color;
             ctx.lineWidth = 2;
             
             ctx.beginPath();
@@ -1747,22 +2239,24 @@
             this.size = Math.random() * 2 + 1;
         }
 
-        update() {
+        update(timeScale = 1.0) {
             if (isBlackHole) {
+                // Particles get sucked in too for visual effect
                 const dx = (width/2) - this.x;
                 const dy = (height/2) - this.y;
                 const distSq = dx*dx + dy*dy;
                 if (distSq > 100) {
                     const dist = Math.sqrt(distSq) || 1;
-                    this.vx += (dx / dist) * 0.5;
-                    this.vy += (dy / dist) * 0.5;
+                    this.vx += (dx / dist) * 0.5 * timeScale;
+                    this.vy += (dy / dist) * 0.5 * timeScale;
                 }
             }
-            this.x += this.vx;
-            this.y += this.vy;
-            this.vx *= 0.95;
-            this.vy *= 0.95;
-            this.life -= this.decay;
+
+            this.x += this.vx * timeScale;
+            this.y += this.vy * timeScale;
+            this.vx *= Math.pow(0.95, timeScale); // Friction
+            this.vy *= Math.pow(0.95, timeScale);
+            this.life -= this.decay * timeScale;
         }
 
         draw(ctx) {
@@ -1787,17 +2281,17 @@
             this.collected = false;
         }
 
-        update() {
-            this.life--;
-            this.angle += 0.1;
+        update(timeScale = 1.0) {
+            this.life -= timeScale;
+            this.angle += 0.1 * timeScale;
             if (isBlackHole) {
                 const dx = (width/2) - this.x;
                 const dy = (height/2) - this.y;
                 const distSq = dx*dx + dy*dy;
                 if (distSq > 100) {
                     const dist = Math.sqrt(distSq) || 1;
-                    this.x += (dx / dist) * 4;
-                    this.y += (dy / dist) * 4;
+                    this.x += (dx / dist) * 4 * timeScale;
+                    this.y += (dy / dist) * 4 * timeScale;
                 } else {
                     this.life = 0;
                 }
@@ -1808,8 +2302,8 @@
                 if (isGlobalMagnet || distSq < 10000) {
                     const dist = Math.sqrt(distSq) || 1;
                     const pullStrength = isGlobalMagnet ? 12 : 4;
-                    this.x += (dx / dist) * pullStrength;
-                    this.y += (dy / dist) * pullStrength;
+                    this.x += (dx / dist) * pullStrength * timeScale;
+                    this.y += (dy / dist) * pullStrength * timeScale;
                 }
             }
         }
@@ -2008,6 +2502,40 @@
             }
         }
 
+        // Orbiting Orbs vs Enemy
+        if (player && isOrbiters) {
+            const orbDist = 50;
+            for(let o = 0; o < 3; o++) {
+                const oAngle = (frame * 0.08) + (o * Math.PI * 2 / 3);
+                const ox = player.x + Math.cos(oAngle) * orbDist;
+                const oy = player.y + Math.sin(oAngle) * orbDist;
+                
+                for (let i = 0; i < enemies.length; i++) {
+                    const e = enemies[i];
+                    const dx = ox - e.x;
+                    const dy = oy - e.y;
+                    const distSq = dx*dx + dy*dy;
+                    if (distSq < (6 + e.radius) * (6 + e.radius)) {
+                        e.hp = 0;
+                    }
+                }
+            }
+        }
+
+        // Forcefield vs Enemy
+        if (player && isForcefield) {
+            for (let i = 0; i < enemies.length; i++) {
+                const e = enemies[i];
+                const dx = player.x - e.x;
+                const dy = player.y - e.y;
+                const distSq = dx*dx + dy*dy;
+                const forcefieldRadius = 45;
+                if (distSq < (forcefieldRadius + e.radius) * (forcefieldRadius + e.radius)) {
+                    e.hp = 0;
+                }
+            }
+        }
+
         // Process Enemy Deaths (Handles both direct hits and AoE explosive kills)
         for (let j = enemies.length - 1; j >= 0; j--) {
             const e = enemies[j];
@@ -2143,9 +2671,42 @@
     function loop() {
         requestAnimationFrame(loop);
 
+        // Calculate global time scale for superhot mode first
+        let globalTimeScale = 1.0;
+        if (state === 'PLAYING' && isSuperhotMode) {
+            const isPlayerMoving = keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire;
+            globalTimeScale = isPlayerMoving ? 1.0 : 0.15;
+        }
+
         // Clear Canvas
         ctx.fillStyle = '#050505';
         ctx.fillRect(0, 0, width, height);
+
+        // Draw Parallax Starfield
+        if (settingShowStars) {
+            stars.forEach(star => {
+                // Constant slow downward drift
+                star.y += star.speed * globalTimeScale;
+
+                // Parallax effect opposite to player velocity
+                if (player && state === 'PLAYING') {
+                    star.x -= player.vx * star.depth * 0.4 * globalTimeScale;
+                    star.y -= player.vy * star.depth * 0.4 * globalTimeScale;
+                }
+
+                // Screen wrapping
+                if (star.y > height) star.y = 0;
+                if (star.y < 0) star.y = height;
+                if (star.x > width) star.x = 0;
+                if (star.x < 0) star.x = width;
+
+                // Draw Star
+                ctx.fillStyle = star.color;
+                ctx.globalAlpha = star.depth * 0.8 + 0.2; // Farther stars are dimmer
+                ctx.fillRect(star.x, star.y, star.size, star.size);
+            });
+            ctx.globalAlpha = 1.0; // Reset alpha
+        }
 
         // Draw Pre-rendered Grid instantly instead of drawing it line-by-line
         if (settingShowGrid && gridCanvas.width > 0 && gridCanvas.height > 0) {
@@ -2167,15 +2728,45 @@
         // Additive Blending for Neon
         ctx.globalCompositeOperation = 'lighter';
 
-        if (state === 'PLAYING') {
-            frame++;
+        frame += globalTimeScale;
+
+        if (state === 'MENU' || state === 'GAMEOVER') {
+            // Draw a massive, slow-spinning geometric mandala in the background
+            ctx.save();
+            ctx.translate(width / 2, height / 2);
             
+            // Outer cyan rotating squares
+            ctx.rotate(frame * 0.002);
+            ctx.strokeStyle = 'rgba(0, 255, 255, 0.15)';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 3; i++) {
+                ctx.rotate(Math.PI / 3);
+                ctx.strokeRect(-150, -150, 300, 300);
+            }
+            
+            // Pulsing rings
+            ctx.beginPath();
+            ctx.arc(0, 0, 220 + Math.sin(frame * 0.03) * 20, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Inner magenta spinning ellipses
+            ctx.rotate(-frame * 0.005);
+            ctx.strokeStyle = 'rgba(255, 0, 255, 0.2)';
+            for (let i = 0; i < 4; i++) {
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 250, 40, (i * Math.PI) / 4, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        if (state === 'PLAYING') {
             // Difficulty scaling
             difficulty = 1 + (frame / 3600); // Increases roughly every minute
 
             // Spawning
             const spawnRate = Math.max(20, 90 - (difficulty * 10)); // Caps at 1 enemy every 20 frames
-            if (frame % Math.floor(spawnRate) === 0) {
+            if (Math.floor(frame) % Math.floor(spawnRate) === 0) {
                 spawnEnemy();
                 if (difficulty > 1.5 && Math.random() > 0.5) spawnEnemy(); // Double spawn chance
             }
@@ -2209,7 +2800,7 @@
             
             // Use backwards loops & fast pops instead of .filter() to prevent Garbage Collection lag
             for (let i = bullets.length - 1; i >= 0; i--) {
-                bullets[i].update();
+                bullets[i].update(globalTimeScale);
                 if (bullets[i].life <= 0 || (!isBouncyBullets && (bullets[i].x < 0 || bullets[i].x > width || bullets[i].y < 0 || bullets[i].y > height))) {
                     bullets[i] = bullets[bullets.length - 1];
                     bullets.pop();
@@ -2217,7 +2808,7 @@
             }
             
             for (let i = enemies.length - 1; i >= 0; i--) {
-                enemies[i].update();
+                enemies[i].update(globalTimeScale);
             }
             
             checkCollisions();
@@ -2228,7 +2819,7 @@
 
         // Always update particles and geoms with backward loops for memory efficiency
         for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update();
+            particles[i].update(state === 'PLAYING' && isSuperhotMode ? (keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire ? 1.0 : 0.15) : 1.0);
             if (particles[i].life <= 0) {
                 particles[i] = particles[particles.length - 1];
                 particles.pop();
@@ -2236,7 +2827,7 @@
         }
         
         for (let i = geoms.length - 1; i >= 0; i--) {
-            geoms[i].update();
+            geoms[i].update(state === 'PLAYING' && isSuperhotMode ? (keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire ? 1.0 : 0.15) : 1.0);
             if (geoms[i].life <= 0) {
                 geoms[i] = geoms[geoms.length - 1];
                 geoms.pop();
