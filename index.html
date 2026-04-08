@@ -238,6 +238,20 @@
             <button id="btn-freeze">Toggle Freeze Enemies</button>
             <button id="btn-giantbullets">Toggle Giant Bullets</button>
             <button id="btn-collectgeoms">Collect All Geoms</button>
+            <button id="btn-nuke">Nuke Screen (Yields Score)</button>
+            <button id="btn-autofire">Toggle Auto-Fire</button>
+            <button id="btn-magnet">Toggle Global Magnet</button>
+            <button id="btn-brutes">Spawn Brute Squad</button>
+            <button id="btn-miniship">Toggle Mini Ship</button>
+            <button id="btn-machinegun">Toggle Machine Gun</button>
+            <button id="btn-piercing">Toggle Piercing Bullets</button>
+            <button id="btn-repellent">Toggle Enemy Repellent</button>
+            <button id="btn-rain">Make It Rain Geoms</button>
+            <button id="btn-slowmo">Toggle Slow Motion</button>
+            <button id="btn-homing">Toggle Homing Bullets</button>
+            <button id="btn-bouncy">Toggle Bouncy Bullets</button>
+            <button id="btn-ghost">Toggle Ghost Mode</button>
+            <button id="btn-instakill">Toggle Insta-Kill</button>
         </div>
     </div>
 
@@ -270,6 +284,20 @@
     const btnFreeze = document.getElementById('btn-freeze');
     const btnGiantBullets = document.getElementById('btn-giantbullets');
     const btnCollectGeoms = document.getElementById('btn-collectgeoms');
+    const btnNuke = document.getElementById('btn-nuke');
+    const btnAutoFire = document.getElementById('btn-autofire');
+    const btnMagnet = document.getElementById('btn-magnet');
+    const btnBrutes = document.getElementById('btn-brutes');
+    const btnMiniShip = document.getElementById('btn-miniship');
+    const btnMachineGun = document.getElementById('btn-machinegun');
+    const btnPiercing = document.getElementById('btn-piercing');
+    const btnRepellent = document.getElementById('btn-repellent');
+    const btnRain = document.getElementById('btn-rain');
+    const btnSlowmo = document.getElementById('btn-slowmo');
+    const btnHoming = document.getElementById('btn-homing');
+    const btnBouncy = document.getElementById('btn-bouncy');
+    const btnGhost = document.getElementById('btn-ghost');
+    const btnInstaKill = document.getElementById('btn-instakill');
 
     // Setup Canvas Size
     let width, height;
@@ -317,6 +345,17 @@
     let isAdminGunActive = false;
     let isFrozen = false;
     let isGiantBullets = false;
+    let isAutoFire = false;
+    let isGlobalMagnet = false;
+    let isMiniShip = false;
+    let isMachineGun = false;
+    let isPiercing = false;
+    let isRepellent = false;
+    let isSlowMo = false;
+    let isHoming = false;
+    let isBouncyBullets = false;
+    let isGhostMode = false;
+    let isInstaKill = false;
 
     // Entities
     let player;
@@ -448,6 +487,94 @@
         updateUI();
     });
 
+    btnNuke.addEventListener('click', () => {
+        if (state !== 'PLAYING') return;
+        enemies.forEach(e => {
+            createExplosion(e.x, e.y, e.color, 15);
+            score += e.scoreValue * multiplier;
+            if (Math.random() > 0.2) {
+                geoms.push(new Geom(e.x, e.y));
+            }
+        });
+        enemies = [];
+        updateUI();
+        shakeAmount = 20;
+    });
+
+    btnAutoFire.addEventListener('click', () => {
+        isAutoFire = !isAutoFire;
+        btnAutoFire.style.background = isAutoFire ? 'rgba(0, 255, 255, 0.4)' : 'transparent';
+    });
+
+    btnMagnet.addEventListener('click', () => {
+        isGlobalMagnet = !isGlobalMagnet;
+        btnMagnet.style.background = isGlobalMagnet ? 'rgba(0, 255, 0, 0.4)' : 'transparent';
+    });
+
+    btnBrutes.addEventListener('click', () => {
+        if (state === 'PLAYING') {
+            for (let i = 0; i < 5; i++) {
+                let x = Math.random() < 0.5 ? -20 : width + 20;
+                let y = Math.random() * height;
+                enemies.push(new Enemy(x, y, 3)); // 3 is Brute type
+            }
+        }
+    });
+
+    btnMiniShip.addEventListener('click', () => {
+        isMiniShip = !isMiniShip;
+        btnMiniShip.style.background = isMiniShip ? 'rgba(0, 255, 255, 0.4)' : 'transparent';
+    });
+
+    btnMachineGun.addEventListener('click', () => {
+        isMachineGun = !isMachineGun;
+        btnMachineGun.style.background = isMachineGun ? 'rgba(255, 0, 0, 0.4)' : 'transparent';
+    });
+
+    btnPiercing.addEventListener('click', () => {
+        isPiercing = !isPiercing;
+        btnPiercing.style.background = isPiercing ? 'rgba(255, 255, 0, 0.4)' : 'transparent';
+    });
+
+    btnRepellent.addEventListener('click', () => {
+        isRepellent = !isRepellent;
+        btnRepellent.style.background = isRepellent ? 'rgba(0, 255, 0, 0.4)' : 'transparent';
+    });
+
+    btnRain.addEventListener('click', () => {
+        if (!player) return;
+        for (let i = 0; i < 50; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 150 + 20;
+            geoms.push(new Geom(player.x + Math.cos(angle) * dist, player.y + Math.sin(angle) * dist));
+        }
+    });
+
+    btnSlowmo.addEventListener('click', () => {
+        isSlowMo = !isSlowMo;
+        btnSlowmo.style.background = isSlowMo ? 'rgba(0, 255, 255, 0.4)' : 'transparent';
+    });
+
+    btnHoming.addEventListener('click', () => {
+        isHoming = !isHoming;
+        btnHoming.style.background = isHoming ? 'rgba(255, 0, 255, 0.4)' : 'transparent';
+    });
+
+    btnBouncy.addEventListener('click', () => {
+        isBouncyBullets = !isBouncyBullets;
+        btnBouncy.style.background = isBouncyBullets ? 'rgba(255, 150, 0, 0.4)' : 'transparent';
+    });
+
+    btnGhost.addEventListener('click', () => {
+        isGhostMode = !isGhostMode;
+        btnGhost.style.background = isGhostMode ? 'rgba(100, 100, 255, 0.4)' : 'transparent';
+    });
+
+    btnInstaKill.addEventListener('click', () => {
+        isInstaKill = !isInstaKill;
+        btnInstaKill.style.background = isInstaKill ? 'rgba(255, 0, 0, 0.6)' : 'transparent';
+    });
+
     // --- CLASSES ---
 
     class Player {
@@ -479,6 +606,8 @@
                 dx /= len; dy /= len;
             }
 
+            this.radius = isMiniShip ? 5 : 15; // Shrink hitbox if mini ship
+
             const currentSpeed = isSpeedBoosted ? this.speed * 2.5 : this.speed;
             this.vx += dx * currentSpeed;
             this.vy += dy * currentSpeed;
@@ -498,7 +627,7 @@
 
             // Shooting
             if (this.shootCooldown > 0) this.shootCooldown--;
-            if (mouse.down && this.shootCooldown <= 0) {
+            if ((mouse.down || isAutoFire) && this.shootCooldown <= 0) {
                 this.shoot();
             }
 
@@ -535,17 +664,19 @@
                 bullets.push(new Bullet(this.x + Math.cos(angle2) * 20, this.y + Math.sin(angle2) * 20, Math.cos(angle2), Math.sin(angle2)));
             }
 
-            this.shootCooldown = this.maxCooldown;
+            this.shootCooldown = isMachineGun ? 1 : this.maxCooldown;
             
             // Recoil
-            this.vx -= bx * 1.5;
-            this.vy -= by * 1.5;
+            this.vx -= bx * (isMachineGun ? 0.5 : 1.5);
+            this.vy -= by * (isMachineGun ? 0.5 : 1.5);
         }
 
         draw(ctx) {
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
+            
+            if (isMiniShip) ctx.scale(0.4, 0.4);
 
             if (this.invulnerable > 0 && Math.floor(Date.now() / 100) % 2 === 0) {
                 ctx.globalAlpha = 0.3;
@@ -561,8 +692,7 @@
 
             ctx.strokeStyle = isGodMode ? '#ff00ff' : this.color;
             ctx.lineWidth = 2;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = isGodMode ? '#ff00ff' : this.color;
+            // Removed shadowBlur and shadowColor for max performance
             ctx.stroke();
 
             // Core
@@ -588,6 +718,45 @@
         }
 
         update() {
+            if (isHoming && enemies.length > 0) {
+                let nearest = null;
+                let minDist = Infinity;
+                
+                // Find nearest enemy
+                for (let i = 0; i < enemies.length; i++) {
+                    const e = enemies[i];
+                    const distSq = (e.x - this.x) * (e.x - this.x) + (e.y - this.y) * (e.y - this.y);
+                    if (distSq < minDist) {
+                        minDist = distSq;
+                        nearest = e;
+                    }
+                }
+                
+                // Steer towards nearest
+                if (nearest) {
+                    const dx = nearest.x - this.x;
+                    const dy = nearest.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    const speed = 15;
+                    
+                    // Increased from 1.5 to 8 for much tighter, direct homing
+                    this.vx += (dx / dist) * 8;
+                    this.vy += (dy / dist) * 8;
+                    
+                    // Normalize to maintain consistent bullet speed
+                    const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    this.vx = (this.vx / currentSpeed) * speed;
+                    this.vy = (this.vy / currentSpeed) * speed;
+                }
+            }
+
+            if (isBouncyBullets) {
+                if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
+                if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
+                this.x = Math.max(this.radius, Math.min(width - this.radius, this.x));
+                this.y = Math.max(this.radius, Math.min(height - this.radius, this.y));
+            }
+
             this.x += this.vx;
             this.y += this.vy;
             this.life--;
@@ -598,8 +767,7 @@
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = this.color;
+            // Removed shadowBlur and shadowColor for max performance
             ctx.fill();
             
             // Trail
@@ -618,8 +786,9 @@
         constructor(x, y, type) {
             this.x = x;
             this.y = y;
-            this.type = type; // 0: Grunt (blue), 1: Wanderer (green), 2: Weaver (pink), 3: Brute (orange), 4: Dart (purple)
-            this.radius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : 10;
+            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : 10;
+            this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
             this.angle = Math.random() * Math.PI * 2;
@@ -654,16 +823,39 @@
                 this.vy = Math.sin(this.angle) * this.speed;
                 this.hp = 1;
                 this.scoreValue = 150;
+            } else if (type === 5) {
+                this.color = '#00ffff'; // Cyan Pulsar
+                this.speed = 1.0 + Math.random() * 0.5 * difficulty;
+                this.vx = Math.cos(this.angle) * this.speed;
+                this.vy = Math.sin(this.angle) * this.speed;
+                this.hp = 4;
+                this.scoreValue = 300;
+                this.pulseFrame = Math.random() * Math.PI * 2;
+            } else if (type === 6) {
+                this.color = '#ff0000'; // Red Dasher
+                this.speed = 0; // Handled dynamically
+                this.hp = 2;
+                this.scoreValue = 250;
+                this.dashTimer = Math.random() * 60;
             }
         }
 
         update() {
             if (!player || isFrozen) return;
 
+            let targetX = player.x;
+            let targetY = player.y;
+
+            if (isGhostMode) {
+                // Enemies lose track of the player and aim toward the center of the arena
+                targetX = width / 2;
+                targetY = height / 2;
+            }
+
             if (this.type === 0 || this.type === 3) {
                 // Grunt and Brute: Follow player
-                const dx = player.x - this.x;
-                const dy = player.y - this.y;
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
                 const distSq = dx*dx + dy*dy;
                 if (distSq > 0) {
                     const dist = Math.sqrt(distSq); // Need sqrt here to normalize speed
@@ -671,17 +863,22 @@
                     this.vy = (dy / dist) * this.speed;
                 }
                 this.angle = Math.atan2(dy, dx);
-            } else if (this.type === 1 || this.type === 4) {
-                // Wanderer and Dart: Bounce off walls
+            } else if (this.type === 1 || this.type === 4 || this.type === 5) {
+                // Wanderer, Dart, and Pulsar: Bounce off walls
                 if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
                 if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
                 if (this.type === 1) this.angle += 0.05;
                 if (this.type === 4) this.angle = Math.atan2(this.vy, this.vx); // Face movement direction
+                if (this.type === 5) {
+                    this.pulseFrame += 0.1;
+                    this.radius = this.baseRadius + Math.sin(this.pulseFrame) * 10;
+                    this.angle += 0.02;
+                }
             } else if (this.type === 2) {
                 // Weaver: Fast, erratic zig-zag towards player
                 this.evadeTimer++;
-                const dx = player.x - this.x;
-                const dy = player.y - this.y;
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
                 let targetAngle = Math.atan2(dy, dx);
                 
                 if (this.evadeTimer % 60 < 30) {
@@ -700,10 +897,41 @@
 
                 this.vx = Math.cos(this.angle) * this.speed;
                 this.vy = Math.sin(this.angle) * this.speed;
+            } else if (this.type === 6) {
+                // Dasher: Stop and lunge
+                this.dashTimer++;
+                if (this.dashTimer > 60) {
+                    const dx = targetX - this.x;
+                    const dy = targetY - this.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                    this.vx = (dx / dist) * (10 + difficulty); // Fast dash
+                    this.vy = (dy / dist) * (10 + difficulty);
+                    this.dashTimer = 0;
+                } else {
+                    // Slow down with friction
+                    this.vx *= 0.85;
+                    this.vy *= 0.85;
+                }
+                if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
+                    this.angle = Math.atan2(this.vy, this.vx);
+                }
             }
 
-            this.x += this.vx;
-            this.y += this.vy;
+            // Enemy Repellent Logic
+            if (player && isRepellent) {
+                const rdx = this.x - player.x;
+                const rdy = this.y - player.y;
+                const rDistSq = rdx*rdx + rdy*rdy;
+                if (rDistSq < 40000) { // 200px radius
+                    const rDist = Math.sqrt(rDistSq) || 1;
+                    this.x += (rdx / rDist) * 5;
+                    this.y += (rdy / rDist) * 5;
+                }
+            }
+
+            const speedMod = isSlowMo ? 0.25 : 1;
+            this.x += this.vx * speedMod;
+            this.y += this.vy * speedMod;
         }
 
         draw(ctx) {
@@ -713,8 +941,7 @@
 
             ctx.strokeStyle = this.color;
             ctx.lineWidth = 2;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = this.color;
+            // Removed shadowBlur and shadowColor for max performance
 
             ctx.beginPath();
             if (this.type === 0) {
@@ -752,6 +979,17 @@
                 ctx.lineTo(-8, 6);
                 ctx.lineTo(-4, 0);
                 ctx.lineTo(-8, -6);
+            } else if (this.type === 5) {
+                // Pulsar (Expanding Circle)
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                if (this.hp < 4) ctx.setLineDash([5, 5]);
+            } else if (this.type === 6) {
+                // Dasher (Spiky Diamond)
+                ctx.moveTo(15, 0);
+                ctx.lineTo(0, 8);
+                ctx.lineTo(-15, 0);
+                ctx.lineTo(0, -8);
+                if (this.hp < 2) ctx.setLineDash([2, 2]);
             }
             ctx.closePath();
             ctx.stroke();
@@ -813,11 +1051,12 @@
                 const dy = player.y - this.y;
                 const distSq = dx*dx + dy*dy;
                 
-                // Magnetism effect if close (100^2 = 10000)
-                if (distSq < 10000) {
-                    const dist = Math.sqrt(distSq);
-                    this.x += (dx / dist) * 4;
-                    this.y += (dy / dist) * 4;
+                // Magnetism effect
+                if (isGlobalMagnet || distSq < 10000) {
+                    const dist = Math.sqrt(distSq) || 1; // prevent divide by zero
+                    const pullStrength = isGlobalMagnet ? 12 : 4;
+                    this.x += (dx / dist) * pullStrength;
+                    this.y += (dy / dist) * pullStrength;
                 }
             }
         }
@@ -834,8 +1073,7 @@
             
             ctx.strokeStyle = this.color;
             ctx.lineWidth = 2;
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = this.color;
+            // Removed shadowBlur and shadowColor for max performance
 
             ctx.beginPath();
             ctx.moveTo(6, 0);
@@ -877,9 +1115,13 @@
         let type = 0; // Grunt default
         const rand = Math.random();
         
-        if (difficulty > 2.0 && rand > 0.85) {
+        if (difficulty > 2.5 && rand > 0.9) {
+            type = 6; // Red Dasher (Lunge attack)
+        } else if (difficulty > 2.0 && rand > 0.8) {
             type = 3; // Brute (Orange tank)
-        } else if (difficulty > 1.5 && rand > 0.7) {
+        } else if (difficulty > 1.8 && rand > 0.7) {
+            type = 5; // Cyan Pulsar (Bouncing hazard)
+        } else if (difficulty > 1.5 && rand > 0.6) {
             type = 4; // Dart (Purple fast)
         } else if (difficulty > 1.2 && rand > 0.4) {
             type = 2; // Weaver
@@ -957,7 +1199,7 @@
 
                 if (distSq < radSum * radSum) {
                     hit = true;
-                    e.hp--;
+                    e.hp -= (isInstaKill ? 100 : 1);
                     createExplosion(b.x, b.y, '#fff', 3); // Small spark
 
                     if (e.hp <= 0) {
@@ -970,14 +1212,21 @@
                             geoms.push(new Geom(e.x, e.y));
                         }
 
-                        enemies.splice(j, 1);
+                        // Fast O(1) array removal
+                        enemies[j] = enemies[enemies.length - 1];
+                        enemies.pop();
+                        
                         updateUI();
                         shakeAmount = Math.min(shakeAmount + 2, 10);
                     }
                     break;
                 }
             }
-            if (hit) bullets.splice(i, 1);
+            if (hit && !isPiercing) {
+                // Fast O(1) array removal
+                bullets[i] = bullets[bullets.length - 1];
+                bullets.pop();
+            }
         }
 
         // Player vs Enemy
@@ -1009,7 +1258,10 @@
 
                 if (distSq < radSum * radSum) {
                     g.collected = true;
-                    geoms.splice(i, 1);
+                    // Fast O(1) array removal
+                    geoms[i] = geoms[geoms.length - 1];
+                    geoms.pop();
+                    
                     geomCount++;
                     
                     // Multiplier thresholds (10, 25, 50, 100...)
@@ -1104,10 +1356,18 @@
 
             if (player) player.update();
             
-            bullets.forEach(b => b.update());
-            bullets = bullets.filter(b => b.life > 0 && b.x > 0 && b.x < width && b.y > 0 && b.y < height);
+            // Use backwards loops & fast pops instead of .filter() to prevent Garbage Collection lag
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                bullets[i].update();
+                if (bullets[i].life <= 0 || (!isBouncyBullets && (bullets[i].x < 0 || bullets[i].x > width || bullets[i].y < 0 || bullets[i].y > height))) {
+                    bullets[i] = bullets[bullets.length - 1];
+                    bullets.pop();
+                }
+            }
             
-            enemies.forEach(e => e.update());
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                enemies[i].update();
+            }
             
             checkCollisions();
         } else if (state === 'GAMEOVER') {
@@ -1115,12 +1375,22 @@
             enemies.forEach(e => { e.vx *= 0.99; e.vy *= 0.99; e.x += e.vx; e.y += e.vy; });
         }
 
-        // Always update particles and geoms
-        particles.forEach(p => p.update());
-        particles = particles.filter(p => p.life > 0);
+        // Always update particles and geoms with backward loops for memory efficiency
+        for (let i = particles.length - 1; i >= 0; i--) {
+            particles[i].update();
+            if (particles[i].life <= 0) {
+                particles[i] = particles[particles.length - 1];
+                particles.pop();
+            }
+        }
         
-        geoms.forEach(g => g.update());
-        geoms = geoms.filter(g => g.life > 0);
+        for (let i = geoms.length - 1; i >= 0; i--) {
+            geoms[i].update();
+            if (geoms[i].life <= 0) {
+                geoms[i] = geoms[geoms.length - 1];
+                geoms.pop();
+            }
+        }
 
         // Draw everything
         geoms.forEach(g => g.draw(ctx));
