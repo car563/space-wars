@@ -198,6 +198,40 @@
             box-shadow: 0 0 15px rgba(var(--admin-color-rgb), 0.8);
         }
 
+        /* Admin Tabs Styling */
+        .admin-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed rgba(var(--admin-color-rgb), 0.5);
+        }
+        
+        #admin-panel .admin-tabs button {
+            margin: 0;
+            padding: 5px;
+            font-size: 0.7rem;
+            width: auto;
+            flex: 1;
+            background: transparent;
+            color: #ccc;
+        }
+
+        #admin-panel .admin-tabs button.active {
+            background: rgba(var(--admin-color-rgb), 0.5);
+            color: #fff;
+            box-shadow: inset 0 0 10px rgba(var(--admin-color-rgb), 0.8);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
         /* Class added via JS to show a button is toggled ON */
         .admin-btn-active {
             background: rgba(var(--admin-color-rgb), 0.5) !important;
@@ -223,6 +257,143 @@
             background: rgba(var(--admin-color-rgb), 0.8);
         }
 
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00ffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            z-index: 200;
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .modal-overlay h2 {
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            margin-top: 0;
+        }
+
+        .modal-overlay label {
+            display: block;
+            margin: 15px 0;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .modal-overlay input[type="checkbox"] {
+            transform: scale(1.5);
+            margin-right: 10px;
+            accent-color: #00ffff;
+        }
+
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            font-size: 1.2rem;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.3);
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .leaderboard-list li span:last-child {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        #game-over-submit {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        #player-name {
+            background: rgba(0, 0, 0, 0.5);
+            color: #00ffff;
+            border: 2px solid #00ffff;
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #auth-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50; /* Above main menu, below modals */
+        }
+
+        .auth-container {
+            border: 2px solid #00ffff;
+            padding: 40px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+
+        .auth-input {
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: 1px solid #00ffff;
+            padding: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 5px;
+        }
+
+        .auth-msg {
+            color: #ff0044;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            min-height: 1.2em;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -231,6 +402,24 @@
 <body>
 
     <canvas id="gameCanvas"></canvas>
+
+    <!-- Pilot Registration / Auth Screen -->
+    <div id="auth-overlay">
+        <div class="auth-container">
+            <h1 style="font-size: 2.5rem; margin-top: 0;">PILOT LOGS</h1>
+            <p id="auth-status" style="color: #00ffff; margin-bottom: 20px;">Connecting to secure server...</p>
+            
+            <div id="auth-form" class="hidden">
+                <p style="color: #aaa; margin-bottom: 20px; font-size: 1rem;">Register a pilot name to securely track your high scores, or play anonymously.</p>
+                <div id="auth-error" class="auth-msg"></div>
+                <input type="text" id="auth-username" class="auth-input" placeholder="Enter Pilot Name" maxlength="15">
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button id="btn-create-account" style="font-size: 1rem; padding: 10px 20px;">REGISTER</button>
+                    <button id="btn-play-guest" style="font-size: 1rem; padding: 10px 20px; border-color: #ff00ff; color: #ff00ff; box-shadow: inset 0 0 10px rgba(255,0,255,0.2);">PLAY AS GUEST</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="ui-layer" class="hidden">
         <div class="top-bar">
@@ -253,12 +442,54 @@
             Left Click to Shoot <br>
             Spacebar to Use Bomb <br>
         </p>
-        <button id="start-btn">START GAME</button>
+
+        <div id="game-over-submit" class="hidden">
+            <div style="color: #00ffff; margin-bottom: 5px; text-shadow: 0 0 5px #00ffff;">Submit Score to Global Leaderboard!</div>
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="player-name" placeholder="Enter Your Name" maxlength="15">
+                <button id="submit-score-btn" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
+            </div>
+        </div>
+
+        <div class="menu-buttons">
+            <button id="start-btn">START GAME</button>
+            <button id="leaderboard-btn">LEADERBOARD</button>
+            <button id="settings-btn">SETTINGS</button>
+            <button id="credits-btn">CREDITS</button>
+        </div>
         
         <div id="cheat-section" style="margin-top: 40px; display: flex; align-items: center;">
             <input type="text" id="cheat-input" placeholder="Enter Cheat Code">
             <button id="cheat-submit" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
         </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <h2>SETTINGS</h2>
+        <label><input type="checkbox" id="chk-shake" checked> Enable Screen Shake</label>
+        <label><input type="checkbox" id="chk-grid" checked> Show Background Grid</label>
+        <label><input type="checkbox" id="chk-particles" checked> High Particle Quality</label>
+        <button id="close-settings-btn" class="close-btn">CLOSE</button>
+    </div>
+
+    <!-- Credits Modal -->
+    <div id="credits-modal" class="modal-overlay hidden">
+        <h2>CREDITS</h2>
+        <p style="color: #fff;"><strong>Design & Code:</strong> AI Assistant</p>
+        <p style="color: #fff;"><strong>Inspiration:</strong> Geometry Wars</p>
+        <p style="color: #fff;"><strong>Font:</strong> Orbitron (Google Fonts)</p>
+        <p style="color: #fff;"><strong>Technology:</strong> HTML5 Canvas & JS</p>
+        <button id="close-credits-btn" class="close-btn">CLOSE</button>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal-overlay hidden">
+        <h2>GLOBAL LEADERBOARD</h2>
+        <ul id="leaderboard-list" class="leaderboard-list">
+            <li>Loading scores...</li>
+        </ul>
+        <button id="close-leaderboard-btn" class="close-btn">CLOSE</button>
     </div>
 
     <div id="admin-panel" class="hidden">
@@ -269,39 +500,63 @@
             <input type="color" id="admin-color-picker" value="#ff00ff">
         </div>
 
-        <div id="admin-panel-buttons" style="display: flex; flex-direction: column; max-height: 250px; overflow-y: auto; padding-right: 5px;">
-            <button id="btn-godmode">Toggle God Mode</button>
-            <button id="btn-addlives">+10 Lives</button>
-            <button id="btn-addbombs">+10 Bombs</button>
-            <button id="btn-addscore">+10,000 Score</button>
-            <button id="btn-multiplier">+10x Multiplier</button>
-            <button id="btn-swarm">Spawn Swarm</button>
-            <button id="btn-speed">Toggle Speed Boost</button>
-            <button id="btn-admingun">Toggle Admin Gun</button>
-            <button id="btn-freeze">Toggle Freeze Enemies</button>
-            <button id="btn-giantbullets">Toggle Giant Bullets</button>
-            <button id="btn-collectgeoms">Collect All Geoms</button>
-            <button id="btn-nuke">Nuke Screen (Yields Score)</button>
-            <button id="btn-autofire">Toggle Auto-Fire</button>
-            <button id="btn-magnet">Toggle Global Magnet</button>
-            <button id="btn-brutes">Spawn Brute Squad</button>
-            <button id="btn-miniship">Toggle Mini Ship</button>
-            <button id="btn-machinegun">Toggle Machine Gun</button>
-            <button id="btn-piercing">Toggle Piercing Bullets</button>
-            <button id="btn-repellent">Toggle Enemy Repellent</button>
-            <button id="btn-rain">Make It Rain Geoms</button>
-            <button id="btn-slowmo">Toggle Slow Motion</button>
-            <button id="btn-homing">Toggle Homing Bullets</button>
-            <button id="btn-bouncy">Toggle Bouncy Bullets</button>
-            <button id="btn-ghost">Toggle Ghost Mode</button>
-            <button id="btn-instakill">Toggle Insta-Kill</button>
-            <button id="btn-teleport">Toggle Right-Click Teleport</button>
-            <button id="btn-blackhole">Toggle Black Hole</button>
-            <button id="btn-mothership">Spawn Mothership</button>
+        <div class="admin-tabs">
+            <button class="active" data-tab="tab-player">Player</button>
+            <button data-tab="tab-weapons">Weapons</button>
+            <button data-tab="tab-score">Score</button>
+            <button data-tab="tab-world">World</button>
+        </div>
+
+        <div id="admin-panel-buttons" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+            <div id="tab-player" class="tab-content active">
+                <button id="btn-godmode">Toggle God Mode</button>
+                <button id="btn-addlives">+10 Lives</button>
+                <button id="btn-addbombs">+10 Bombs</button>
+                <button id="btn-speed">Toggle Speed Boost</button>
+                <button id="btn-miniship">Toggle Mini Ship</button>
+                <button id="btn-repellent">Toggle Enemy Repellent</button>
+                <button id="btn-ghost">Toggle Ghost Mode</button>
+                <button id="btn-teleport">Toggle Right-Click Teleport</button>
+                <button id="btn-magnet">Toggle Global Magnet</button>
+            </div>
+            
+            <div id="tab-weapons" class="tab-content">
+                <button id="btn-admingun">Toggle Admin Gun</button>
+                <button id="btn-autofire">Toggle Auto-Fire</button>
+                <button id="btn-machinegun">Toggle Machine Gun</button>
+                <button id="btn-giantbullets">Toggle Giant Bullets</button>
+                <button id="btn-piercing">Toggle Piercing Bullets</button>
+                <button id="btn-homing">Toggle Homing Bullets</button>
+                <button id="btn-bouncy">Toggle Bouncy Bullets</button>
+                <button id="btn-explosive">Toggle Explosive Bullets</button>
+                <button id="btn-instakill">Toggle Insta-Kill</button>
+                <button id="btn-norecoil">Toggle No Recoil</button>
+            </div>
+
+            <div id="tab-score" class="tab-content">
+                <button id="btn-addscore">+10,000 Score</button>
+                <button id="btn-multiplier">+10x Multiplier</button>
+                <button id="btn-collectgeoms">Collect All Geoms</button>
+                <button id="btn-rain">Make It Rain Geoms</button>
+                <button id="btn-nuke">Nuke Screen (Yields Score)</button>
+            </div>
+
+            <div id="tab-world" class="tab-content">
+                <button id="btn-freeze">Toggle Freeze Enemies</button>
+                <button id="btn-slowmo">Toggle Slow Motion</button>
+                <button id="btn-swarm">Spawn Swarm</button>
+                <button id="btn-brutes">Spawn Brute Squad</button>
+                <button id="btn-mothership">Spawn Mothership</button>
+                <button id="btn-blackhole">Toggle Black Hole</button>
+            </div>
         </div>
     </div>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     
@@ -314,6 +569,25 @@
     const overlay = document.getElementById('overlay');
     const startBtn = document.getElementById('start-btn');
     const titleText = document.getElementById('title-text');
+
+    // New Menu Elements
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const leaderboardModal = document.getElementById('leaderboard-modal');
+    const closeLeaderboardBtn = document.getElementById('close-leaderboard-btn');
+    const leaderboardListUI = document.getElementById('leaderboard-list');
+    const gameOverSubmitSection = document.getElementById('game-over-submit');
+    const playerNameInput = document.getElementById('player-name');
+    const submitScoreBtn = document.getElementById('submit-score-btn');
+
+    const settingsBtn = document.getElementById('settings-btn');
+    const creditsBtn = document.getElementById('credits-btn');
+    const settingsModal = document.getElementById('settings-modal');
+    const creditsModal = document.getElementById('credits-modal');
+    const closeSettingsBtn = document.getElementById('close-settings-btn');
+    const closeCreditsBtn = document.getElementById('close-credits-btn');
+    const chkShake = document.getElementById('chk-shake');
+    const chkGrid = document.getElementById('chk-grid');
+    const chkParticles = document.getElementById('chk-particles');
 
     // Cheat / Admin Elements
     const cheatInput = document.getElementById('cheat-input');
@@ -345,10 +619,26 @@
     const btnHoming = document.getElementById('btn-homing');
     const btnBouncy = document.getElementById('btn-bouncy');
     const btnGhost = document.getElementById('btn-ghost');
-    const btnInstaKill = document.getElementById('btn-instakill');
+    const btnInstakill = document.getElementById('btn-instakill');
+    const btnExplosive = document.getElementById('btn-explosive');
+    const btnNoRecoil = document.getElementById('btn-norecoil');
     const btnTeleport = document.getElementById('btn-teleport');
     const btnBlackHole = document.getElementById('btn-blackhole');
     const btnMothership = document.getElementById('btn-mothership');
+
+    // Auth UI Elements
+    const authOverlay = document.getElementById('auth-overlay');
+    const authStatus = document.getElementById('auth-status');
+    const authForm = document.getElementById('auth-form');
+    const authUsernameInput = document.getElementById('auth-username');
+    const btnCreateAccount = document.getElementById('btn-create-account');
+    const btnPlayGuest = document.getElementById('btn-play-guest');
+    const authError = document.getElementById('auth-error');
+
+    // Game Settings
+    let settingScreenShake = true;
+    let settingShowGrid = true;
+    let settingHighParticles = true;
 
     // Setup Canvas Size
     let width, height;
@@ -388,6 +678,183 @@
     let difficulty = 1;
     let shakeAmount = 0;
     let bombFlash = 0;
+    let usedAdminThisRun = false;
+    let hasSubmittedScore = false;
+
+    // Account State
+    let savedUsername = "";
+    let isGuest = true;
+
+    // Firebase State
+    let db, auth, currentUser, appId;
+    let leaderboardData = [];
+
+    // --- FIREBASE INITIALIZATION ---
+    try {
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            initAuth();
+
+            onAuthStateChanged(auth, async (user) => {
+                currentUser = user;
+                if (user && db) {
+                    setupLeaderboardListener();
+                    authStatus.innerText = "Authenticating Profile...";
+                    await checkUserProfile(user.uid);
+                }
+            });
+        } else {
+            throw new Error("Firebase config missing");
+        }
+    } catch (e) {
+        console.warn("Firebase not configured in this environment.");
+        if(authStatus) authStatus.innerText = "Offline Mode Active";
+        setTimeout(() => {
+            if(authOverlay) authOverlay.classList.add('hidden');
+        }, 1500);
+    }
+
+    async function checkUserProfile(uid) {
+        try {
+            const profileRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'info');
+            const profileSnap = await getDoc(profileRef);
+            
+            if (profileSnap.exists()) {
+                // Profile exists! Auto-login
+                savedUsername = profileSnap.data().username;
+                isGuest = false;
+                authOverlay.classList.add('hidden');
+            } else {
+                // No profile found, show registration form
+                authStatus.classList.add('hidden');
+                authForm.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.error("Profile check failed", e);
+            authStatus.innerText = "Error communicating with server.";
+            setTimeout(() => {
+                authOverlay.classList.add('hidden'); // Fallback to guest mode essentially
+            }, 2000);
+        }
+    }
+
+    // --- ACCOUNT CREATION / GUEST LOGIC ---
+    btnCreateAccount.addEventListener('click', async () => {
+        const name = authUsernameInput.value.trim();
+        if (!name) {
+            authError.innerText = "Please enter a valid Pilot Name.";
+            return;
+        }
+        if (name.toLowerCase() === 'admin' || name.toLowerCase() === 'guest') {
+            authError.innerText = "That name is reserved.";
+            return;
+        }
+        if (!currentUser || !db) return;
+
+        btnCreateAccount.disabled = true;
+        btnCreateAccount.innerText = "REGISTERING...";
+        authError.innerText = "";
+
+        try {
+            const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'info');
+            await setDoc(profileRef, { 
+                username: name, 
+                createdAt: Date.now() 
+            });
+            savedUsername = name;
+            isGuest = false;
+            authOverlay.classList.add('hidden');
+        } catch (e) {
+            console.error("Registration error:", e);
+            authError.innerText = "Failed to register profile. Try again.";
+            btnCreateAccount.disabled = false;
+            btnCreateAccount.innerText = "REGISTER";
+        }
+    });
+
+    btnPlayGuest.addEventListener('click', () => {
+        savedUsername = "Guest_" + Math.floor(Math.random() * 9999);
+        isGuest = true;
+        authOverlay.classList.add('hidden');
+    });
+
+    function setupLeaderboardListener() {
+        if (!currentUser || !db) return;
+        const lbRef = collection(db, 'artifacts', appId, 'public', 'data', 'space_wars_leaderboard');
+        
+        onSnapshot(lbRef, (snapshot) => {
+            const scores = [];
+            snapshot.forEach(doc => {
+                scores.push({ id: doc.id, ...doc.data() });
+            });
+            // Sort descending in memory
+            scores.sort((a, b) => b.score - a.score);
+            leaderboardData = scores.slice(0, 10);
+            renderLeaderboard();
+        }, (err) => {
+            console.error("Leaderboard error:", err);
+        });
+    }
+
+    function renderLeaderboard() {
+        leaderboardListUI.innerHTML = '';
+        if (leaderboardData.length === 0) {
+            leaderboardListUI.innerHTML = '<li>No scores yet. Be the first!</li>';
+            return;
+        }
+        leaderboardData.forEach((entry, index) => {
+            const li = document.createElement('li');
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.innerText = `${index + 1}. ${entry.name}`;
+            
+            const scoreSpan = document.createElement('span');
+            scoreSpan.innerText = entry.score.toLocaleString();
+            
+            li.appendChild(nameSpan);
+            li.appendChild(scoreSpan);
+            leaderboardListUI.appendChild(li);
+        });
+    }
+
+    submitScoreBtn.addEventListener('click', async () => {
+        if (hasSubmittedScore || !currentUser || !db || score <= 0) return;
+        const name = playerNameInput.value.trim().substring(0, 15) || "Anonymous";
+        
+        submitScoreBtn.disabled = true;
+        submitScoreBtn.innerText = "SUBMITTING...";
+
+        try {
+            const lbRef = collection(db, 'artifacts', appId, 'public', 'data', 'space_wars_leaderboard');
+            await addDoc(lbRef, {
+                name: name,
+                score: score,
+                timestamp: Date.now()
+            });
+            hasSubmittedScore = true;
+            submitScoreBtn.innerText = "SUBMITTED!";
+            submitScoreBtn.style.background = "rgba(0, 255, 0, 0.4)";
+            submitScoreBtn.style.borderColor = "#00ff00";
+            submitScoreBtn.style.color = "#00ff00";
+        } catch (err) {
+            console.error(err);
+            submitScoreBtn.innerText = "ERROR!";
+            submitScoreBtn.disabled = false;
+        }
+    });
 
     // Admin State
     let adminUnlocked = false;
@@ -407,6 +874,8 @@
     let isBouncyBullets = false;
     let isGhostMode = false;
     let isInstaKill = false;
+    let isExplosiveBullets = false;
+    let isNoRecoil = false;
     let isClickTeleport = false;
     let isBlackHole = false;
 
@@ -463,6 +932,20 @@
         if(e.button === 0) mouse.down = false;
     });
 
+    // --- MENU MODAL LOGIC ---
+    leaderboardBtn.addEventListener('click', () => leaderboardModal.classList.remove('hidden'));
+    closeLeaderboardBtn.addEventListener('click', () => leaderboardModal.classList.add('hidden'));
+
+    settingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+    
+    creditsBtn.addEventListener('click', () => creditsModal.classList.remove('hidden'));
+    closeCreditsBtn.addEventListener('click', () => creditsModal.classList.add('hidden'));
+
+    chkShake.addEventListener('change', (e) => settingScreenShake = e.target.checked);
+    chkGrid.addEventListener('change', (e) => settingShowGrid = e.target.checked);
+    chkParticles.addEventListener('change', (e) => settingHighParticles = e.target.checked);
+
     // --- ADMIN PANEL THEME LOGIC ---
     function hexToRgb(hex) {
         let r = parseInt(hex.slice(1, 3), 16),
@@ -478,16 +961,70 @@
         document.documentElement.style.setProperty('--admin-color-rgb', rgb);
     });
 
+    // --- ADMIN TABS LOGIC ---
+    const adminTabs = document.querySelectorAll('.admin-tabs button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    adminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active from all tabs & contents
+            adminTabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active to clicked tab & corresponding content
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+    });
+
     // --- CHEAT CODE LOGIC ---
     cheatSubmit.addEventListener('click', () => {
         if (cheatInput.value.toLowerCase() === 'admin') {
-            adminUnlocked = true;
+            adminUnlocked = !adminUnlocked;
             cheatInput.value = '';
-            cheatInput.placeholder = 'Unlocked! Press ` to toggle';
-            cheatInput.style.borderColor = 'var(--admin-color)';
-            cheatSubmit.style.borderColor = 'var(--admin-color)';
-            cheatInput.style.color = 'var(--admin-color)';
-            cheatSubmit.style.color = 'var(--admin-color)';
+            
+            if (adminUnlocked) {
+                usedAdminThisRun = true;
+                cheatInput.placeholder = 'Unlocked! Press ` to toggle';
+                cheatInput.style.borderColor = 'var(--admin-color)';
+                cheatSubmit.style.borderColor = 'var(--admin-color)';
+                cheatInput.style.color = 'var(--admin-color)';
+                cheatSubmit.style.color = 'var(--admin-color)';
+            } else {
+                cheatInput.placeholder = 'Admin Disabled';
+                cheatInput.style.borderColor = '';
+                cheatSubmit.style.borderColor = '';
+                cheatInput.style.color = '';
+                cheatSubmit.style.color = '';
+                adminPanel.classList.add('hidden');
+                
+                // Turn off all active cheats when disabling admin
+                isGodMode = false;
+                isSpeedBoosted = false;
+                isAdminGunActive = false;
+                isFrozen = false;
+                isGiantBullets = false;
+                isAutoFire = false;
+                isGlobalMagnet = false;
+                isMiniShip = false;
+                isMachineGun = false;
+                isPiercing = false;
+                isRepellent = false;
+                isSlowMo = false;
+                isHoming = false;
+                isBouncyBullets = false;
+                isGhostMode = false;
+                isInstaKill = false;
+                isExplosiveBullets = false;
+                isNoRecoil = false;
+                isClickTeleport = false;
+                isBlackHole = false;
+                
+                // Reset active button visuals on the panel
+                document.querySelectorAll('#admin-panel button').forEach(btn => {
+                    btn.classList.remove('admin-btn-active');
+                });
+            }
         } else {
             cheatInput.value = '';
             cheatInput.placeholder = 'Invalid Code';
@@ -658,9 +1195,19 @@
         toggleAdminBtn(btnGhost, isGhostMode);
     });
 
-    btnInstaKill.addEventListener('click', () => {
+    btnInstakill.addEventListener('click', () => {
         isInstaKill = !isInstaKill;
-        toggleAdminBtn(btnInstaKill, isInstaKill);
+        toggleAdminBtn(btnInstakill, isInstaKill);
+    });
+
+    btnExplosive.addEventListener('click', () => {
+        isExplosiveBullets = !isExplosiveBullets;
+        toggleAdminBtn(btnExplosive, isExplosiveBullets);
+    });
+
+    btnNoRecoil.addEventListener('click', () => {
+        isNoRecoil = !isNoRecoil;
+        toggleAdminBtn(btnNoRecoil, isNoRecoil);
     });
 
     btnTeleport.addEventListener('click', () => {
@@ -773,8 +1320,11 @@
             this.shootCooldown = isMachineGun ? 1 : this.maxCooldown;
             
             // Recoil
-            this.vx -= bx * (isMachineGun ? 0.5 : 1.5);
-            this.vy -= by * (isMachineGun ? 0.5 : 1.5);
+            if (!isNoRecoil) {
+                const baseRecoil = 1.5;
+                this.vx -= bx * (isMachineGun ? (baseRecoil / 3) : baseRecoil);
+                this.vy -= by * (isMachineGun ? (baseRecoil / 3) : baseRecoil);
+            }
         }
 
         draw(ctx) {
@@ -828,29 +1378,18 @@
             if (isHoming && enemies.length > 0) {
                 let nearest = null;
                 let minDist = Infinity;
-                
-                // Find nearest enemy
                 for (let i = 0; i < enemies.length; i++) {
                     const e = enemies[i];
                     const distSq = (e.x - this.x) * (e.x - this.x) + (e.y - this.y) * (e.y - this.y);
-                    if (distSq < minDist) {
-                        minDist = distSq;
-                        nearest = e;
-                    }
+                    if (distSq < minDist) { minDist = distSq; nearest = e; }
                 }
-                
-                // Steer towards nearest
                 if (nearest) {
                     const dx = nearest.x - this.x;
                     const dy = nearest.y - this.y;
                     const dist = Math.sqrt(dx * dx + dy * dy) || 1;
                     const speed = 15;
-                    
-                    // Increased from 1.5 to 8 for much tighter, direct homing
                     this.vx += (dx / dist) * 8;
                     this.vy += (dy / dist) * 8;
-                    
-                    // Normalize to maintain consistent bullet speed
                     const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
                     this.vx = (this.vx / currentSpeed) * speed;
                     this.vy = (this.vy / currentSpeed) * speed;
@@ -875,15 +1414,12 @@
             ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
             ctx.fillStyle = this.color;
             ctx.fill();
-            
-            // Trail
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
             ctx.lineTo(this.x - this.vx * 1.5, this.y - this.vy * 1.5);
             ctx.strokeStyle = this.color;
             ctx.lineWidth = 2;
             ctx.stroke();
-            
             ctx.restore();
         }
     }
@@ -892,8 +1428,8 @@
         constructor(x, y, type) {
             this.x = x;
             this.y = y;
-            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership
-            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : 10;
+            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership, 8: Jumper, 9: Slither, 10: Splitter
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : 10;
             this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
@@ -948,6 +1484,23 @@
                 this.speed = 0.5 + Math.random() * 0.2;
                 this.hp = 50; // Super Tanky
                 this.scoreValue = 2000;
+            } else if (type === 8) {
+                this.color = '#ffffff'; // White Jumper
+                this.speed = 1.0 + Math.random() * 0.5;
+                this.hp = 2;
+                this.scoreValue = 200;
+                this.jumpTimer = Math.random() * 60;
+            } else if (type === 9) {
+                this.color = '#ffff00'; // Yellow Slither
+                this.speed = 2.0 + Math.random() * difficulty * 0.5;
+                this.hp = 1;
+                this.scoreValue = 120;
+                this.waveTimer = Math.random() * Math.PI * 2;
+            } else if (type === 10) {
+                this.color = '#00ffcc'; // Teal Splitter
+                this.speed = 1.2 + Math.random() * 0.5 * difficulty;
+                this.hp = 3;
+                this.scoreValue = 300;
             }
         }
 
@@ -958,18 +1511,15 @@
                 const dx = centerX - this.x;
                 const dy = centerY - this.y;
                 const distSq = dx*dx + dy*dy;
-                
-                // Pull forcefully towards the black hole
-                if (distSq > 400) { // Keep pulling unless extremely close
+                if (distSq > 400) {
                     const dist = Math.sqrt(distSq) || 1;
                     this.x += (dx / dist) * 4;
                     this.y += (dy / dist) * 4;
                     this.angle += 0.1;
                 } else {
-                    // Crushed by the black hole!
                     this.hp -= 100; 
                 }
-                return; // Skip normal AI when falling into black hole
+                return;
             }
 
             if (!player || isFrozen) return;
@@ -978,68 +1528,56 @@
             let targetY = player.y;
 
             if (isGhostMode) {
-                // Enemies lose track of the player and aim toward the center of the arena
                 targetX = width / 2;
                 targetY = height / 2;
             }
 
             if (this.type === 0 || this.type === 3) {
-                // Grunt and Brute: Follow player
                 const dx = targetX - this.x;
                 const dy = targetY - this.y;
                 const distSq = dx*dx + dy*dy;
                 if (distSq > 0) {
-                    const dist = Math.sqrt(distSq); // Need sqrt here to normalize speed
+                    const dist = Math.sqrt(distSq);
                     this.vx = (dx / dist) * this.speed;
                     this.vy = (dy / dist) * this.speed;
                 }
                 this.angle = Math.atan2(dy, dx);
             } else if (this.type === 1 || this.type === 4 || this.type === 5) {
-                // Wanderer, Dart, and Pulsar: Bounce off walls
                 if (this.x < this.radius || this.x > width - this.radius) this.vx *= -1;
                 if (this.y < this.radius || this.y > height - this.radius) this.vy *= -1;
                 if (this.type === 1) this.angle += 0.05;
-                if (this.type === 4) this.angle = Math.atan2(this.vy, this.vx); // Face movement direction
+                if (this.type === 4) this.angle = Math.atan2(this.vy, this.vx);
                 if (this.type === 5) {
                     this.pulseFrame += 0.1;
                     this.radius = this.baseRadius + Math.sin(this.pulseFrame) * 10;
                     this.angle += 0.02;
                 }
             } else if (this.type === 2) {
-                // Weaver: Fast, erratic zig-zag towards player
                 this.evadeTimer++;
                 const dx = targetX - this.x;
                 const dy = targetY - this.y;
                 let targetAngle = Math.atan2(dy, dx);
-                
                 if (this.evadeTimer % 60 < 30) {
-                    targetAngle += Math.PI / 4; // Veer off
+                    targetAngle += Math.PI / 4;
                 } else {
                     targetAngle -= Math.PI / 4;
                 }
-                
-                // Smooth turning
                 let angleDiff = targetAngle - this.angle;
-                // Normalize diff
                 while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
                 while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
-                
                 this.angle += angleDiff * 0.1;
-
                 this.vx = Math.cos(this.angle) * this.speed;
                 this.vy = Math.sin(this.angle) * this.speed;
             } else if (this.type === 6) {
-                // Dasher: Stop and lunge
                 this.dashTimer++;
                 if (this.dashTimer > 60) {
                     const dx = targetX - this.x;
                     const dy = targetY - this.y;
                     const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-                    this.vx = (dx / dist) * (10 + difficulty); // Fast dash
+                    this.vx = (dx / dist) * (10 + difficulty);
                     this.vy = (dy / dist) * (10 + difficulty);
                     this.dashTimer = 0;
                 } else {
-                    // Slow down with friction
                     this.vx *= 0.85;
                     this.vy *= 0.85;
                 }
@@ -1047,35 +1585,71 @@
                     this.angle = Math.atan2(this.vy, this.vx);
                 }
             } else if (this.type === 7) {
-                // Mothership: Drift slowly toward center and spawn minions
                 const dx = (width / 2) - this.x;
                 const dy = (height / 2) - this.y;
                 const distSq = dx*dx + dy*dy;
-                
                 if (distSq > 10000) {
                     const dist = Math.sqrt(distSq) || 1;
                     this.vx = (dx / dist) * this.speed;
                     this.vy = (dy / dist) * this.speed;
                 } else {
-                    // Slow down if near center
                     this.vx *= 0.95;
                     this.vy *= 0.95;
                 }
-                
                 this.angle += 0.02;
-
-                // Spawn a new grunt occasionally
                 if (frame % 90 === 0) {
                     enemies.push(new Enemy(this.x, this.y, 0)); 
                 }
+            } else if (this.type === 8) {
+                this.jumpTimer++;
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+                
+                if (this.jumpTimer > 150) {
+                    createExplosion(this.x, this.y, this.color, 10);
+                    const jumpDist = Math.min(120, dist - 30);
+                    this.x += (dx / dist) * jumpDist;
+                    this.y += (dy / dist) * jumpDist;
+                    createExplosion(this.x, this.y, '#ffffff', 10);
+                    this.jumpTimer = 0;
+                } else {
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                }
+                this.angle = Math.atan2(dy, dx);
+            } else if (this.type === 9) {
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                let targetAngle = Math.atan2(dy, dx);
+                this.waveTimer += 0.15;
+                let angleDiff = targetAngle - this.angle;
+                while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+                while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+                this.angle += angleDiff * 0.05;
+                const bx = Math.cos(this.angle) * this.speed;
+                const by = Math.sin(this.angle) * this.speed;
+                const px = Math.cos(this.angle + Math.PI/2) * Math.sin(this.waveTimer) * 4;
+                const py = Math.sin(this.angle + Math.PI/2) * Math.sin(this.waveTimer) * 4;
+                this.vx = bx + px;
+                this.vy = by + py;
+            } else if (this.type === 10) {
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const distSq = dx*dx + dy*dy;
+                if (distSq > 0) {
+                    const dist = Math.sqrt(distSq);
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                }
+                this.angle += 0.03;
             }
 
-            // Enemy Repellent Logic
             if (player && isRepellent) {
                 const rdx = this.x - player.x;
                 const rdy = this.y - player.y;
                 const rDistSq = rdx*rdx + rdy*rdy;
-                if (rDistSq < 40000) { // 200px radius
+                if (rDistSq < 40000) {
                     const rDist = Math.sqrt(rDistSq) || 1;
                     this.x += (rdx / rDist) * 5;
                     this.y += (rdy / rDist) * 5;
@@ -1097,70 +1671,48 @@
             
             ctx.beginPath();
             if (this.type === 0) {
-                // Diamond
-                ctx.moveTo(12, 0);
-                ctx.lineTo(0, 12);
-                ctx.lineTo(-12, 0);
-                ctx.lineTo(0, -12);
+                ctx.moveTo(12, 0); ctx.lineTo(0, 12); ctx.lineTo(-12, 0); ctx.lineTo(0, -12);
             } else if (this.type === 1) {
-                // Square/Pinwheel
-                ctx.rect(-10, -10, 20, 20);
-                ctx.moveTo(-10, -10); ctx.lineTo(10, 10);
-                ctx.moveTo(10, -10); ctx.lineTo(-10, 10);
+                ctx.rect(-10, -10, 20, 20); ctx.moveTo(-10, -10); ctx.lineTo(10, 10); ctx.moveTo(10, -10); ctx.lineTo(-10, 10);
             } else if (this.type === 2) {
-                // Triangle
-                ctx.moveTo(14, 0);
-                ctx.lineTo(-10, 10);
-                ctx.lineTo(-10, -10);
-                if (this.hp === 1) {
-                     // Visually damaged
-                     ctx.setLineDash([2, 2]);
-                }
+                ctx.moveTo(14, 0); ctx.lineTo(-10, 10); ctx.lineTo(-10, -10);
+                if (this.hp === 1) ctx.setLineDash([2, 2]);
             } else if (this.type === 3) {
-                // Hexagon (Brute)
                 for (let i = 0; i < 6; i++) {
                     const a = (i * Math.PI) / 3;
                     if (i === 0) ctx.moveTo(Math.cos(a) * 20, Math.sin(a) * 20);
                     else ctx.lineTo(Math.cos(a) * 20, Math.sin(a) * 20);
                 }
-                // Visual damage scaling for brute
                 ctx.lineWidth = Math.max(1, this.hp / 2);
             } else if (this.type === 4) {
-                // Thin arrow/dart
-                ctx.moveTo(12, 0);
-                ctx.lineTo(-8, 6);
-                ctx.lineTo(-4, 0);
-                ctx.lineTo(-8, -6);
+                ctx.moveTo(12, 0); ctx.lineTo(-8, 6); ctx.lineTo(-4, 0); ctx.lineTo(-8, -6);
             } else if (this.type === 5) {
-                // Pulsar (Expanding Circle)
                 ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
                 if (this.hp < 4) ctx.setLineDash([5, 5]);
             } else if (this.type === 6) {
-                // Dasher (Spiky Diamond)
-                ctx.moveTo(15, 0);
-                ctx.lineTo(0, 8);
-                ctx.lineTo(-15, 0);
-                ctx.lineTo(0, -8);
+                ctx.moveTo(15, 0); ctx.lineTo(0, 8); ctx.lineTo(-15, 0); ctx.lineTo(0, -8);
                 if (this.hp < 2) ctx.setLineDash([2, 2]);
             } else if (this.type === 7) {
-                // Mothership (Massive Octagon + Core)
                 for (let i = 0; i < 8; i++) {
                     const a = (i * Math.PI) / 4;
                     if (i === 0) ctx.moveTo(Math.cos(a) * 35, Math.sin(a) * 35);
                     else ctx.lineTo(Math.cos(a) * 35, Math.sin(a) * 35);
                 }
-                ctx.closePath();
-                ctx.stroke();
-                
-                // Inner core
+                ctx.closePath(); ctx.stroke();
                 ctx.beginPath();
                 ctx.arc(0, 0, 15, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 0, 85, 0.2)';
-                ctx.fill();
+                ctx.fillStyle = 'rgba(255, 0, 85, 0.2)'; ctx.fill();
                 ctx.lineWidth = Math.max(2, this.hp / 10);
+            } else if (this.type === 8) {
+                ctx.moveTo(12, 12); ctx.lineTo(-12, -12); ctx.lineTo(-12, 12); ctx.lineTo(12, -12);
+            } else if (this.type === 9) {
+                ctx.moveTo(12, 0); ctx.lineTo(-6, 10); ctx.lineTo(-12, 10); ctx.lineTo(6, 0); ctx.lineTo(-12, -10); ctx.lineTo(-6, -10);
+            } else if (this.type === 10) {
+                ctx.moveTo(16, -4); ctx.lineTo(4, -4); ctx.lineTo(4, -16); ctx.lineTo(-4, -16); ctx.lineTo(-4, -4); ctx.lineTo(-16, -4);
+                ctx.lineTo(-16, 4); ctx.lineTo(-4, 4); ctx.lineTo(-4, 16); ctx.lineTo(4, 16); ctx.lineTo(4, 4); ctx.lineTo(16, 4);
+                if (this.hp < 3) ctx.setLineDash([3, 3]);
             }
             
-            // Close path for non-motherships (mothership draws its own inner core)
             if (this.type !== 7) {
                 ctx.closePath();
                 ctx.stroke();
@@ -1185,7 +1737,6 @@
 
         update() {
             if (isBlackHole) {
-                // Particles get sucked in too for visual effect
                 const dx = (width/2) - this.x;
                 const dy = (height/2) - this.y;
                 const distSq = dx*dx + dy*dy;
@@ -1195,10 +1746,9 @@
                     this.vy += (dy / dist) * 0.5;
                 }
             }
-
             this.x += this.vx;
             this.y += this.vy;
-            this.vx *= 0.95; // Friction
+            this.vx *= 0.95;
             this.vy *= 0.95;
             this.life -= this.decay;
         }
@@ -1220,7 +1770,7 @@
             this.y = y;
             this.radius = 6;
             this.color = '#00ff00';
-            this.life = 600; // 10 seconds at 60fps
+            this.life = 600;
             this.angle = 0;
             this.collected = false;
         }
@@ -1228,7 +1778,6 @@
         update() {
             this.life--;
             this.angle += 0.1;
-
             if (isBlackHole) {
                 const dx = (width/2) - this.x;
                 const dy = (height/2) - this.y;
@@ -1238,16 +1787,14 @@
                     this.x += (dx / dist) * 4;
                     this.y += (dy / dist) * 4;
                 } else {
-                    this.life = 0; // Destroyed in black hole
+                    this.life = 0;
                 }
             } else if (player && !this.collected) {
                 const dx = player.x - this.x;
                 const dy = player.y - this.y;
                 const distSq = dx*dx + dy*dy;
-                
-                // Magnetism effect
                 if (isGlobalMagnet || distSq < 10000) {
-                    const dist = Math.sqrt(distSq) || 1; // prevent divide by zero
+                    const dist = Math.sqrt(distSq) || 1;
                     const pullStrength = isGlobalMagnet ? 12 : 4;
                     this.x += (dx / dist) * pullStrength;
                     this.y += (dy / dist) * pullStrength;
@@ -1257,28 +1804,18 @@
 
         draw(ctx) {
             if (this.life <= 0) return;
-            
-            // Blink when fading
             if (this.life < 100 && Math.floor(this.life / 10) % 2 === 0) return;
-
             ctx.save();
             ctx.translate(this.x, this.y);
             ctx.rotate(this.angle);
-            
             ctx.strokeStyle = this.color;
             ctx.lineWidth = 2;
-
             ctx.beginPath();
-            ctx.moveTo(6, 0);
-            ctx.lineTo(0, 6);
-            ctx.lineTo(-6, 0);
-            ctx.lineTo(0, -6);
+            ctx.moveTo(6, 0); ctx.lineTo(0, 6); ctx.lineTo(-6, 0); ctx.lineTo(0, -6);
             ctx.closePath();
             ctx.stroke();
-
             ctx.fillStyle = 'rgba(0, 255, 0, 0.3)';
             ctx.fill();
-
             ctx.restore();
         }
     }
@@ -1286,7 +1823,8 @@
     // --- GAME LOGIC ---
 
     function createExplosion(x, y, color, amount) {
-        for (let i = 0; i < amount; i++) {
+        const actualAmount = settingHighParticles ? amount : Math.ceil(amount / 3);
+        for (let i = 0; i < actualAmount; i++) {
             particles.push(new Particle(x, y, color));
         }
     }
@@ -1311,17 +1849,23 @@
         // Rare chance for mothership natively late game
         if (difficulty > 3.5 && rand > 0.98) {
             type = 7; 
-        } else if (difficulty > 2.5 && rand > 0.9) {
+        } else if (difficulty > 2.8 && rand > 0.93) {
+            type = 8; // White Jumper
+        } else if (difficulty > 2.5 && rand > 0.86) {
             type = 6; // Red Dasher (Lunge attack)
-        } else if (difficulty > 2.0 && rand > 0.8) {
+        } else if (difficulty > 2.2 && rand > 0.78) {
             type = 3; // Brute (Orange tank)
-        } else if (difficulty > 1.8 && rand > 0.7) {
+        } else if (difficulty > 1.9 && rand > 0.70) {
+            type = 10; // Teal Splitter
+        } else if (difficulty > 1.8 && rand > 0.62) {
             type = 5; // Cyan Pulsar (Bouncing hazard)
-        } else if (difficulty > 1.5 && rand > 0.6) {
+        } else if (difficulty > 1.6 && rand > 0.54) {
+            type = 9; // Yellow Slither
+        } else if (difficulty > 1.5 && rand > 0.45) {
             type = 4; // Dart (Purple fast)
-        } else if (difficulty > 1.2 && rand > 0.4) {
+        } else if (difficulty > 1.2 && rand > 0.3) {
             type = 2; // Weaver
-        } else if (rand > 0.3) {
+        } else if (rand > 0.15) {
             type = 1; // Wanderer
         }
 
@@ -1366,7 +1910,36 @@
             titleText.innerText = "GAME OVER";
             titleText.style.color = "#ff0044";
             titleText.style.textShadow = "0 0 20px #ff0044";
-            document.getElementById('instructions').innerHTML = `Final Score: <span style="color:#fff; font-size: 2rem;">${score}</span>`;
+            
+            let htmlStr = `Final Score: <span style="color:#fff; font-size: 2rem;">${score}</span>`;
+            if (usedAdminThisRun) {
+                htmlStr += `<br><span style="font-size: 1rem; color: var(--admin-color); text-shadow: 0 0 5px var(--admin-color);">(Admin Cheats Used - Score Not Eligible)</span>`;
+            }
+            document.getElementById('instructions').innerHTML = htmlStr;
+            
+            if (!usedAdminThisRun && score > 0 && currentUser && db) {
+                gameOverSubmitSection.classList.remove('hidden');
+                hasSubmittedScore = false;
+                submitScoreBtn.innerText = "SUBMIT SCORE";
+                submitScoreBtn.disabled = false;
+                submitScoreBtn.style.background = "transparent";
+                submitScoreBtn.style.borderColor = "#00ffff";
+                submitScoreBtn.style.color = "#fff";
+                
+                // Pre-fill and lock name if registered account
+                if (!isGuest && savedUsername) {
+                    playerNameInput.value = savedUsername;
+                    playerNameInput.readOnly = true;
+                    playerNameInput.style.opacity = '0.7';
+                } else {
+                    playerNameInput.value = "";
+                    playerNameInput.readOnly = false;
+                    playerNameInput.style.opacity = '1';
+                }
+            } else {
+                gameOverSubmitSection.classList.add('hidden');
+            }
+
             startBtn.innerText = "PLAY AGAIN";
             player = null;
         } else {
@@ -1398,26 +1971,21 @@
                     e.hp -= (isInstaKill ? 100 : 1);
                     createExplosion(b.x, b.y, '#fff', 3); // Small spark
 
-                    if (e.hp <= 0) {
-                        // Kill enemy
-                        createExplosion(e.x, e.y, e.color, (e.type === 7 ? 50 : 15));
-                        score += e.scoreValue * multiplier;
-                        
-                        // Drop Geom (Motherships drop 5)
-                        const geomDrops = e.type === 7 ? 5 : 1;
-                        for(let g = 0; g < geomDrops; g++) {
-                            if (Math.random() > 0.2 || e.type === 7) { 
-                                geoms.push(new Geom(e.x + (Math.random()*20-10), e.y + (Math.random()*20-10)));
+                    // Explosive Bullet AoE Blast
+                    if (isExplosiveBullets) {
+                        createExplosion(b.x, b.y, '#ff8800', 25); // Fiery orange blast
+                        for (let k = 0; k < enemies.length; k++) {
+                            const ek = enemies[k];
+                            if (ek !== e) {
+                                const edx = ek.x - b.x;
+                                const edy = ek.y - b.y;
+                                if (edx*edx + edy*edy < 14400) { // 120px blast radius
+                                    ek.hp -= 5; // Heavy AoE damage
+                                }
                             }
                         }
-
-                        // Fast O(1) array removal
-                        enemies[j] = enemies[enemies.length - 1];
-                        enemies.pop();
-                        
-                        updateUI();
-                        shakeAmount = Math.min(shakeAmount + (e.type === 7 ? 10 : 2), 20);
                     }
+
                     break;
                 }
             }
@@ -1425,6 +1993,50 @@
                 // Fast O(1) array removal
                 bullets[i] = bullets[bullets.length - 1];
                 bullets.pop();
+            }
+        }
+
+        // Process Enemy Deaths (Handles both direct hits and AoE explosive kills)
+        for (let j = enemies.length - 1; j >= 0; j--) {
+            const e = enemies[j];
+            if (e.hp <= 0) {
+                // Kill enemy
+                createExplosion(e.x, e.y, e.color, (e.type === 7 ? 50 : 15));
+                score += e.scoreValue * multiplier;
+                
+                // Drop Geom (Motherships drop 5)
+                const geomDrops = e.type === 7 ? 5 : 1;
+                for(let g = 0; g < geomDrops; g++) {
+                    if (Math.random() > 0.2 || e.type === 7) { 
+                        geoms.push(new Geom(e.x + (Math.random()*20-10), e.y + (Math.random()*20-10)));
+                    }
+                }
+
+                // Splitter bursts into 3 fast mini grunts!
+                if (e.type === 10) {
+                    for(let s = 0; s < 3; s++) {
+                        let mini = new Enemy(e.x, e.y, 0);
+                        mini.baseRadius = 8;
+                        mini.radius = 8;
+                        mini.speed = 3.5 + Math.random(); // Make them zoom
+                        
+                        // Push them outward immediately
+                        const angle = (Math.PI * 2 / 3) * s + Math.random();
+                        mini.vx = Math.cos(angle) * 5;
+                        mini.vy = Math.sin(angle) * 5;
+                        mini.x += mini.vx * 3;
+                        mini.y += mini.vy * 3;
+                        
+                        enemies.push(mini);
+                    }
+                }
+
+                // Fast O(1) array removal
+                enemies[j] = enemies[enemies.length - 1];
+                enemies.pop();
+                
+                updateUI();
+                shakeAmount = Math.min(shakeAmount + (e.type === 7 ? 10 : 2), 20);
             }
         }
 
@@ -1491,6 +2103,7 @@
         bombs = 3;
         difficulty = 1;
         frame = 0;
+        usedAdminThisRun = adminUnlocked;
         
         player = new Player(width / 2, height / 2);
         enemies = [];
@@ -1523,16 +2136,18 @@
         ctx.fillRect(0, 0, width, height);
 
         // Draw Pre-rendered Grid instantly instead of drawing it line-by-line
-        if (gridCanvas.width > 0 && gridCanvas.height > 0) {
+        if (settingShowGrid && gridCanvas.width > 0 && gridCanvas.height > 0) {
             ctx.drawImage(gridCanvas, 0, 0);
         }
 
         // Screen Shake
         ctx.save();
         if (shakeAmount > 0) {
-            const sx = (Math.random() - 0.5) * shakeAmount;
-            const sy = (Math.random() - 0.5) * shakeAmount;
-            ctx.translate(sx, sy);
+            if (settingScreenShake) {
+                const sx = (Math.random() - 0.5) * shakeAmount;
+                const sy = (Math.random() - 0.5) * shakeAmount;
+                ctx.translate(sx, sy);
+            }
             shakeAmount *= 0.9;
             if (shakeAmount < 0.5) shakeAmount = 0;
         }
