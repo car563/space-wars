@@ -273,11 +273,27 @@
 
     // Setup Canvas Size
     let width, height;
+    const gridCanvas = document.createElement('canvas');
+    const gridCtx = gridCanvas.getContext('2d');
+
     function resize() {
-        width = window.innerWidth;
-        height = window.innerHeight;
+        // Ensure width and height are never 0 to prevent drawImage errors
+        width = Math.max(1, window.innerWidth);
+        height = Math.max(1, window.innerHeight);
         canvas.width = width;
         canvas.height = height;
+
+        // Pre-render the grid background to save performance
+        gridCanvas.width = width;
+        gridCanvas.height = height;
+        gridCtx.clearRect(0, 0, width, height);
+        gridCtx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
+        gridCtx.lineWidth = 1;
+        const gridSize = 50;
+        gridCtx.beginPath();
+        for (let x = 0; x < width; x += gridSize) { gridCtx.moveTo(x, 0); gridCtx.lineTo(x, height); }
+        for (let y = 0; y < height; y += gridSize) { gridCtx.moveTo(0, y); gridCtx.lineTo(width, y); }
+        gridCtx.stroke();
     }
     window.addEventListener('resize', resize);
     resize();
@@ -648,8 +664,9 @@
                 // Grunt and Brute: Follow player
                 const dx = player.x - this.x;
                 const dy = player.y - this.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > 0) {
+                const distSq = dx*dx + dy*dy;
+                if (distSq > 0) {
+                    const dist = Math.sqrt(distSq); // Need sqrt here to normalize speed
                     this.vx = (dx / dist) * this.speed;
                     this.vy = (dy / dist) * this.speed;
                 }
@@ -768,8 +785,7 @@
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
             ctx.fillStyle = this.color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = this.color;
+            // Removed shadowBlur and shadowColor for massive performance boost on particles
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
@@ -795,10 +811,11 @@
             if (player && !this.collected) {
                 const dx = player.x - this.x;
                 const dy = player.y - this.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
+                const distSq = dx*dx + dy*dy;
                 
-                // Magnetism effect if close
-                if (dist < 100) {
+                // Magnetism effect if close (100^2 = 10000)
+                if (distSq < 10000) {
+                    const dist = Math.sqrt(distSq);
                     this.x += (dx / dist) * 4;
                     this.y += (dy / dist) * 4;
                 }
@@ -872,8 +889,8 @@
 
         // Don't spawn too close to player initially
         if (player) {
-            const dist = Math.sqrt(Math.pow(player.x - x, 2) + Math.pow(player.y - y, 2));
-            if (dist < 200) return; // Skip this spawn
+            const distSq = Math.pow(player.x - x, 2) + Math.pow(player.y - y, 2);
+            if (distSq < 40000) return; // Skip this spawn (200^2 = 40000)
         }
 
         enemies.push(new Enemy(x, y, type));
@@ -919,8 +936,8 @@
             player = new Player(width / 2, height / 2);
             // Clear nearby enemies
             enemies = enemies.filter(e => {
-                const dist = Math.sqrt(Math.pow(player.x - e.x, 2) + Math.pow(player.y - e.y, 2));
-                return dist > 250;
+                const distSq = Math.pow(player.x - e.x, 2) + Math.pow(player.y - e.y, 2);
+                return distSq > 62500; // 250^2 = 62500
             });
         }
     }
@@ -935,9 +952,10 @@
                 const e = enemies[j];
                 const dx = b.x - e.x;
                 const dy = b.y - e.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
+                const distSq = dx*dx + dy*dy;
+                const radSum = e.radius + b.radius;
 
-                if (dist < e.radius + b.radius) {
+                if (distSq < radSum * radSum) {
                     hit = true;
                     e.hp--;
                     createExplosion(b.x, b.y, '#fff', 3); // Small spark
@@ -968,9 +986,10 @@
                 const e = enemies[i];
                 const dx = player.x - e.x;
                 const dy = player.y - e.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
+                const distSq = dx*dx + dy*dy;
+                const radSum = player.radius + e.radius - 2; // Tiny leeway
 
-                if (dist < player.radius + e.radius - 2) { // Tiny leeway
+                if (distSq < radSum * radSum) {
                     playerDeath();
                     break;
                 }
@@ -985,9 +1004,10 @@
 
                 const dx = player.x - g.x;
                 const dy = player.y - g.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
+                const distSq = dx*dx + dy*dy;
+                const radSum = player.radius + g.radius;
 
-                if (dist < player.radius + g.radius) {
+                if (distSq < radSum * radSum) {
                     g.collected = true;
                     geoms.splice(i, 1);
                     geomCount++;
@@ -1009,25 +1029,6 @@
         scoreEl.innerText = score;
         multiplierEl.innerText = `${multiplier}x`;
         livesEl.innerText = `Lives: ${lives}`;
-    }
-
-    function drawGrid(ctx) {
-        ctx.save();
-        ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)';
-        ctx.lineWidth = 1;
-        const gridSize = 50;
-        
-        ctx.beginPath();
-        for (let x = 0; x < width; x += gridSize) {
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-        }
-        for (let y = 0; y < height; y += gridSize) {
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-        }
-        ctx.stroke();
-        ctx.restore();
     }
 
     function startGame() {
@@ -1070,7 +1071,10 @@
         ctx.fillStyle = '#050505';
         ctx.fillRect(0, 0, width, height);
 
-        drawGrid(ctx);
+        // Draw Pre-rendered Grid instantly instead of drawing it line-by-line
+        if (gridCanvas.width > 0 && gridCanvas.height > 0) {
+            ctx.drawImage(gridCanvas, 0, 0);
+        }
 
         // Screen Shake
         ctx.save();
