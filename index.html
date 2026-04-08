@@ -470,6 +470,7 @@
         <label><input type="checkbox" id="chk-shake" checked> Enable Screen Shake</label>
         <label><input type="checkbox" id="chk-grid" checked> Show Background Grid</label>
         <label><input type="checkbox" id="chk-particles" checked> High Particle Quality</label>
+        <button id="change-pilot-btn" style="margin-top: 15px; padding: 10px 20px; font-size: 1rem; background: rgba(255,0,255,0.2); border: 2px solid #ff00ff; color: #fff; cursor: pointer; border-radius: 5px; width: 100%; box-shadow: 0 0 10px rgba(255,0,255,0.3);">CHANGE PILOT NAME</button>
         <button id="close-settings-btn" class="close-btn">CLOSE</button>
     </div>
 
@@ -588,6 +589,7 @@
     const chkShake = document.getElementById('chk-shake');
     const chkGrid = document.getElementById('chk-grid');
     const chkParticles = document.getElementById('chk-particles');
+    const changePilotBtn = document.getElementById('change-pilot-btn');
 
     // Cheat / Admin Elements
     const cheatInput = document.getElementById('cheat-input');
@@ -945,6 +947,16 @@
     chkShake.addEventListener('change', (e) => settingScreenShake = e.target.checked);
     chkGrid.addEventListener('change', (e) => settingShowGrid = e.target.checked);
     chkParticles.addEventListener('change', (e) => settingHighParticles = e.target.checked);
+
+    changePilotBtn.addEventListener('click', () => {
+        settingsModal.classList.add('hidden');
+        authOverlay.classList.remove('hidden');
+        authStatus.classList.add('hidden');
+        authForm.classList.remove('hidden');
+        authUsernameInput.value = isGuest ? "" : savedUsername;
+        authError.innerText = "";
+        btnCreateAccount.innerText = isGuest ? "REGISTER" : "UPDATE PROFILE";
+    });
 
     // --- ADMIN PANEL THEME LOGIC ---
     function hexToRgb(hex) {
