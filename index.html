@@ -78,56 +78,73 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(ellipse at center, rgba(0, 20, 10, 0.45) 0%, rgba(0, 0, 0, 0.7) 55%, rgba(0, 0, 0, 0.92) 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: radial-gradient(circle at center, rgba(0, 30, 40, 0.6) 0%, rgba(0, 0, 0, 0.8) 60%, rgba(0, 0, 0, 0.95) 100%);
+            backdrop-filter: blur(4px);
+            overflow-y: auto;
+            overflow-x: hidden;
             pointer-events: auto;
             z-index: 10;
         }
 
-        /* ── GW Title Block ── */
-        #gw-title-block {
-            text-align: center;
-            margin-bottom: 48px;
-            line-height: 1;
+        /* Custom scrollbar for the menu */
+        #overlay::-webkit-scrollbar {
+            width: 10px;
+        }
+        #overlay::-webkit-scrollbar-track {
+            background: rgba(0, 255, 255, 0.05);
+        }
+        #overlay::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+        #overlay::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 255, 0.6);
         }
 
-        #title-text {
-            font-size: clamp(2.8rem, 6vw, 5rem);
-            font-weight: 900;
-            letter-spacing: 0.06em;
-            color: #05ff6a;
-            text-shadow:
-                0 0 8px #05ff6a,
-                0 0 22px #05ff6a,
-                0 0 55px #00cc44;
-            -webkit-text-stroke: 1.5px #00ff55;
-            display: block;
-            animation: gwPulse 3.5s ease-in-out infinite;
+        #overlay-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            width: 100%;
         }
 
-        #gw-title-sub {
-            display: block;
-            font-size: clamp(0.85rem, 2vw, 1.3rem);
-            font-weight: 400;
-            letter-spacing: 0.55em;
-            color: #00dd55;
-            text-shadow: 0 0 10px #00cc44, 0 0 28px #006622;
-            margin-top: 6px;
-        }
-
-        @keyframes gwPulse {
-            0%,100% { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 22px currentColor); }
-            50%      { filter: drop-shadow(0 0 18px currentColor) drop-shadow(0 0 45px currentColor); }
+        @keyframes pulseGlow {
+            0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
+            50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #00ffff; transform: scale(1.02); }
+            100% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
         }
 
         h1 {
             font-size: 4rem;
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
             color: #fff;
             text-align: center;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        #subtitle {
+            font-size: 1.2rem;
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+            margin-bottom: 15px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        #menu-high-score {
+            font-size: 1.3rem;
+            color: #00ffff;
+            text-shadow: 0 0 8px #00ffff;
+            margin-bottom: 25px;
+            font-weight: bold;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(0, 255, 255, 0.3);
         }
 
         p {
@@ -138,12 +155,23 @@
             line-height: 1.5;
         }
 
-        /* ── GW-style menu list ── */
-        .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-            align-items: center;
+        #instructions {
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 15px 40px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #menu-tips {
+            margin-top: 40px;
+            color: #88ccff;
+            font-size: 1rem;
+            text-align: center;
+            width: 100%;
+            text-shadow: 0 0 5px rgba(136, 204, 255, 0.5);
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
         }
 
         button {
@@ -165,49 +193,6 @@
             background: rgba(0, 255, 255, 0.2);
             box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 25px rgba(0, 255, 255, 0.5);
             transform: scale(1.05);
-        }
-
-        /* Override the .menu-buttons buttons to be GW plain-text style */
-        .menu-buttons button {
-            background: transparent;
-            border: none;
-            box-shadow: none;
-            padding: 10px 0;
-            font-size: clamp(1rem, 2.2vw, 1.35rem);
-            font-weight: 400;
-            letter-spacing: 0.18em;
-            color: #33ee77;
-            text-shadow: 0 0 8px #00cc44, 0 0 18px #00aa33;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: color 0.15s, text-shadow 0.15s;
-            border-radius: 0;
-            width: auto;
-            position: relative;
-        }
-
-        .menu-buttons button:hover,
-        .menu-buttons button.gw-selected {
-            color: #ffffff;
-            text-shadow: 0 0 12px #88ffaa, 0 0 30px #00ff55, 0 0 55px #00cc44;
-            transform: none;
-            background: transparent;
-            box-shadow: none;
-        }
-
-        /* Red star selector next to hovered item */
-        .menu-buttons button.gw-selected::before {
-            content: '✦';
-            position: absolute;
-            left: -1.6em;
-            color: #ff2244;
-            text-shadow: 0 0 10px #ff0033, 0 0 22px #ff0033;
-            animation: selectorBlink 0.9s ease-in-out infinite;
-        }
-
-        @keyframes selectorBlink {
-            0%,100% { opacity: 1; }
-            50%      { opacity: 0.45; }
         }
 
         #cheat-input {
@@ -522,34 +507,39 @@
     </div>
 
     <div id="overlay">
-        <!-- Geometry Wars-style title -->
-        <div id="gw-title-block">
-            <span id="title-text">SPACE WARS</span>
-            <span id="gw-title-sub">RETRO&nbsp;&nbsp;EVOLVED</span>
-        </div>
+        <div id="overlay-content">
+            <h1 id="title-text">SPACE WARS</h1>
+            <div id="subtitle">Defend the Neon Galaxy</div>
+            <div id="menu-high-score">Personal Best: 0</div>
 
-        <p id="instructions" style="font-size:0.85rem; letter-spacing:0.08em; color:#44aa66; text-shadow:0 0 8px #004422; margin-bottom:36px;">
-            WASD / L-Stick to Move &nbsp;·&nbsp; Mouse / R-Stick to Aim &nbsp;·&nbsp; Click / RT to Shoot &nbsp;·&nbsp; Space / LT for Bomb
-        </p>
+            <p id="instructions">
+                WASD / L-Stick to Move <br>
+                Mouse / R-Stick to Aim <br>
+                Left Click / RT to Shoot <br>
+                Spacebar / LT to Use Bomb <br>
+            </p>
 
-        <div id="game-over-submit" class="hidden">
-            <div style="color: #00ffff; margin-bottom: 5px; text-shadow: 0 0 5px #00ffff;">Submit Score to Global Leaderboard!</div>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" id="player-name" placeholder="Enter Your Name" maxlength="15">
-                <button id="submit-score-btn" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
+            <div id="game-over-submit" class="hidden">
+                <div style="color: #00ffff; margin-bottom: 5px; text-shadow: 0 0 5px #00ffff;">Submit Score to Global Leaderboard!</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="player-name" placeholder="Enter Your Name" maxlength="15">
+                    <button id="submit-score-btn" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
+                </div>
             </div>
-        </div>
 
-        <div class="menu-buttons">
-            <button id="start-btn" class="gw-selected">PLAY GAME</button>
-            <button id="leaderboard-btn">LEADERBOARDS</button>
-            <button id="settings-btn">SETTINGS</button>
-            <button id="credits-btn">CREDITS</button>
-        </div>
-        
-        <div id="cheat-section" style="margin-top: 40px; display: flex; align-items: center;">
-            <input type="text" id="cheat-input" placeholder="Enter Cheat Code">
-            <button id="cheat-submit" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
+            <div class="menu-buttons">
+                <button id="start-btn">START GAME</button>
+                <button id="leaderboard-btn">LEADERBOARD</button>
+                <button id="settings-btn">SETTINGS</button>
+                <button id="credits-btn">CREDITS</button>
+            </div>
+            
+            <div id="cheat-section" style="margin-top: 40px; display: flex; align-items: center;">
+                <input type="text" id="cheat-input" placeholder="Enter Cheat Code">
+                <button id="cheat-submit" style="padding: 10px 20px; font-size: 1rem;">Submit</button>
+            </div>
+
+            <div id="menu-tips">Tip: Collect Geoms to increase your score multiplier!</div>
         </div>
     </div>
 
@@ -681,6 +671,9 @@
     const overlay = document.getElementById('overlay');
     const startBtn = document.getElementById('start-btn');
     const titleText = document.getElementById('title-text');
+    const subtitleText = document.getElementById('subtitle');
+    const menuHighScoreEl = document.getElementById('menu-high-score');
+    const menuTipsEl = document.getElementById('menu-tips');
 
     // New Menu Elements
     const leaderboardBtn = document.getElementById('leaderboard-btn');
@@ -775,6 +768,22 @@
     let settingShowGrid = true;
     let settingHighParticles = true;
     let settingShowStars = true;
+
+    // Load Local High Score
+    let localHighScore = localStorage.getItem('spaceWarsHighScore') || 0;
+    menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
+
+    // Tips Array
+    const tipsArray = [
+        "Tip: Collect Geoms to increase your score multiplier!",
+        "Tip: Use your Bomb (Spacebar / LT) when overwhelmed.",
+        "Tip: The Admin Panel (`) holds ultimate power...",
+        "Tip: Enemies get faster and tougher the longer you survive.",
+        "Tip: Right-click if you have the Teleport cheat active!",
+        "Tip: Motherships drop multiple Geoms when destroyed.",
+        "Tip: Weavers (Pink Triangles) will try to dodge your shots.",
+        "Tip: Plug in a controller to play with twin-stick aiming!"
+    ];
 
     // Setup Canvas Size
     let width, height;
@@ -1167,6 +1176,19 @@
             setTimeout(() => msg.remove(), 500);
         }, 3000);
     });
+
+    // Rotate Menu Tips
+    setInterval(() => {
+        if (state === 'MENU' || state === 'GAMEOVER') {
+            if (menuTipsEl) {
+                menuTipsEl.style.opacity = 0;
+                setTimeout(() => {
+                    menuTipsEl.innerText = tipsArray[Math.floor(Math.random() * tipsArray.length)];
+                    menuTipsEl.style.opacity = 1;
+                }, 500);
+            }
+        }
+    }, 4000);
 
     // --- MENU MODAL LOGIC ---
     leaderboardBtn.addEventListener('click', () => leaderboardModal.classList.remove('hidden'));
@@ -1641,60 +1663,86 @@
             if (keys.d || keys.ArrowRight) dx += 1;
 
             let isGamepadShooting = false;
-            let gp = null;
+            let gpBomb = false;
+            let gpTeleport = false;
+
+            // Omnidirectional Controller Polling (Bypasses Phantom Devices)
             if (navigator.getGamepads) {
                 const gamepads = navigator.getGamepads();
                 for (let i = 0; i < gamepads.length; i++) {
-                    if (gamepads[i] && gamepads[i].connected) {
-                        gp = gamepads[i];
-                        break;
+                    const gp = gamepads[i];
+                    if (gp && gp.connected && gp.axes && gp.buttons) {
+                        const deadzone = 0.2;
+                        
+                        // Left Stick (Axes 0 & 1)
+                        if (gp.axes.length >= 2) {
+                            if (Math.abs(gp.axes[0]) > deadzone) dx += gp.axes[0];
+                            if (Math.abs(gp.axes[1]) > deadzone) dy += gp.axes[1];
+                        }
+                        
+                        // D-Pad (Buttons 12-15)
+                        if (gp.buttons.length >= 16) {
+                            if (gp.buttons[14]?.pressed) dx -= 1; // Left
+                            if (gp.buttons[15]?.pressed) dx += 1; // Right
+                            if (gp.buttons[12]?.pressed) dy -= 1; // Up
+                            if (gp.buttons[13]?.pressed) dy += 1; // Down
+                        }
+
+                        // Right Stick Aim (Axes 2 & 3)
+                        if (gp.axes.length >= 4) {
+                            let rx = gp.axes[2];
+                            let ry = gp.axes[3];
+                            
+                            // Some generic controllers map the right stick to 3 & 4
+                            if (gp.axes.length >= 5 && Math.abs(gp.axes[2]) < 0.01 && Math.abs(gp.axes[3]) > deadzone && Math.abs(gp.axes[4]) > deadzone) {
+                                rx = gp.axes[3];
+                                ry = gp.axes[4];
+                            }
+
+                            if (Math.abs(rx) > deadzone || Math.abs(ry) > deadzone) {
+                                lastAimMode = 'gamepad';
+                                this.angle = Math.atan2(ry, rx);
+                            }
+                        }
+
+                        // Shoot (RT or RB)
+                        if ((gp.buttons.length >= 8 && gp.buttons[7]?.pressed) || (gp.buttons.length >= 6 && gp.buttons[5]?.pressed)) {
+                            isGamepadShooting = true;
+                        }
+
+                        // Bomb (LT or B Button)
+                        if ((gp.buttons.length >= 7 && gp.buttons[6]?.pressed) || (gp.buttons.length >= 2 && gp.buttons[1]?.pressed)) {
+                            gpBomb = true;
+                        }
+
+                        // Teleport Cheat (LB or X Button)
+                        if (isClickTeleport && ((gp.buttons.length >= 5 && gp.buttons[4]?.pressed) || (gp.buttons.length >= 3 && gp.buttons[2]?.pressed))) {
+                            gpTeleport = true;
+                        }
                     }
                 }
             }
 
-            if (gp) {
-                const deadzone = 0.2;
-                // Left Stick
-                if (Math.abs(gp.axes[0]) > deadzone) dx += gp.axes[0];
-                if (Math.abs(gp.axes[1]) > deadzone) dy += gp.axes[1];
-                // D-Pad
-                if (gp.buttons[14]?.pressed) dx -= 1; // Left
-                if (gp.buttons[15]?.pressed) dx += 1; // Right
-                if (gp.buttons[12]?.pressed) dy -= 1; // Up
-                if (gp.buttons[13]?.pressed) dy += 1; // Down
+            // Apply Bomb Logic
+            if (gpBomb) {
+                if (!this.prevBombPressed && state === 'PLAYING') useBomb();
+                this.prevBombPressed = true;
+            } else {
+                this.prevBombPressed = false;
+            }
 
-                // Right Stick Aim
-                if (Math.abs(gp.axes[2]) > deadzone || Math.abs(gp.axes[3]) > deadzone) {
-                    lastAimMode = 'gamepad';
-                    this.angle = Math.atan2(gp.axes[3], gp.axes[2]);
+            // Apply Teleport Logic
+            if (gpTeleport) {
+                if (!this.prevTeleportPressed && state === 'PLAYING') {
+                    const teleportDist = 200;
+                    createExplosion(this.x, this.y, this.color, 15);
+                    this.x += Math.cos(this.angle) * teleportDist;
+                    this.y += Math.sin(this.angle) * teleportDist;
+                    createExplosion(this.x, this.y, '#ffffff', 15);
                 }
-
-                // Shoot (RT or RB)
-                if (gp.buttons[7]?.pressed || gp.buttons[5]?.pressed) {
-                    isGamepadShooting = true;
-                }
-
-                // Bomb (LT or B Button)
-                if (gp.buttons[6]?.pressed || gp.buttons[1]?.pressed) {
-                    if (!this.prevBombPressed && state === 'PLAYING') useBomb();
-                    this.prevBombPressed = true;
-                } else {
-                    this.prevBombPressed = false;
-                }
-
-                // Teleport Cheat (LB or X Button)
-                if (isClickTeleport && (gp.buttons[4]?.pressed || gp.buttons[2]?.pressed)) {
-                    if (!this.prevTeleportPressed && state === 'PLAYING') {
-                        const teleportDist = 200;
-                        createExplosion(this.x, this.y, this.color, 15);
-                        this.x += Math.cos(this.angle) * teleportDist;
-                        this.y += Math.sin(this.angle) * teleportDist;
-                        createExplosion(this.x, this.y, '#ffffff', 15);
-                    }
-                    this.prevTeleportPressed = true;
-                } else {
-                    this.prevTeleportPressed = false;
-                }
+                this.prevTeleportPressed = true;
+            } else {
+                this.prevTeleportPressed = false;
             }
 
             const len = Math.sqrt(dx*dx + dy*dy);
@@ -1928,40 +1976,25 @@
                 ctx.globalAlpha = 0.3;
             }
 
-            // Draw Ship — glow pass then crisp pass
+            // Draw Ship (Claw shape)
+            ctx.beginPath();
+            ctx.moveTo(15, 0);
+            ctx.lineTo(-10, 10);
+            ctx.lineTo(-5, 0);
+            ctx.lineTo(-10, -10);
+            ctx.closePath();
+
+            // Match God Mode color to dynamic admin panel color
             const drawColor = isGodMode ? adminColorPicker.value : this.color;
-
-            ctx.shadowColor = drawColor;
-            ctx.shadowBlur = 20;
-            ctx.beginPath();
-            ctx.moveTo(15, 0);
-            ctx.lineTo(-10, 10);
-            ctx.lineTo(-5, 0);
-            ctx.lineTo(-10, -10);
-            ctx.closePath();
             ctx.strokeStyle = drawColor;
-            ctx.lineWidth = 4;
-            ctx.stroke();
-
-            ctx.shadowBlur = 0;
-            ctx.beginPath();
-            ctx.moveTo(15, 0);
-            ctx.lineTo(-10, 10);
-            ctx.lineTo(-5, 0);
-            ctx.lineTo(-10, -10);
-            ctx.closePath();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             // Core
             ctx.beginPath();
-            ctx.arc(-2, 0, 4, 0, Math.PI * 2);
+            ctx.arc(-2, 0, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
-            ctx.shadowColor = '#ffffff';
-            ctx.shadowBlur = 10;
             ctx.fill();
-            ctx.shadowBlur = 0;
 
             if (isForcefield) {
                 ctx.beginPath();
@@ -2582,6 +2615,13 @@
             titleText.style.color = "#ff0044";
             titleText.style.textShadow = "0 0 20px #ff0044";
             
+            // Check Local High Score
+            if (score > localHighScore && !usedAdminThisRun) {
+                localHighScore = score;
+                localStorage.setItem('spaceWarsHighScore', localHighScore);
+                menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
+            }
+
             let htmlStr = `Final Score: <span style="color:#fff; font-size: 2rem;">${score}</span>`;
             if (usedAdminThisRun) {
                 htmlStr += `<br><span style="font-size: 1rem; color: var(--admin-color); text-shadow: 0 0 5px var(--admin-color);">(Admin Cheats Used - Score Not Eligible)</span>`;
@@ -2819,6 +2859,14 @@
         overlay.classList.add('hidden');
         uiLayer.classList.remove('hidden');
         
+        // Reset instructions text back to normal for the next game over
+        document.getElementById('instructions').innerHTML = `
+            WASD / L-Stick to Move <br>
+            Mouse / R-Stick to Aim <br>
+            Left Click / RT to Shoot <br>
+            Spacebar / LT to Use Bomb <br>
+        `;
+        
         if (adminUnlocked) {
             adminPanel.classList.remove('hidden');
         } else {
@@ -2838,32 +2886,31 @@
     function loop() {
         requestAnimationFrame(loop);
 
-        // Global Gamepad check for Menu navigation
-        let globalGp = null;
+        // Global Gamepad check for Menu navigation (Omnidirectional polling)
+        let menuBtn = false;
         if (navigator.getGamepads) {
             const gamepads = navigator.getGamepads();
             for (let i = 0; i < gamepads.length; i++) {
-                if (gamepads[i] && gamepads[i].connected) {
-                    globalGp = gamepads[i];
-                    break;
+                const gp = gamepads[i];
+                if (gp && gp.connected && gp.buttons) {
+                    // A Button (0) or Start Button (9)
+                    if ((gp.buttons.length >= 1 && gp.buttons[0]?.pressed) || (gp.buttons.length >= 10 && gp.buttons[9]?.pressed)) {
+                        menuBtn = true;
+                    }
                 }
             }
         }
 
-        if (globalGp) {
-            // A Button (0) or Start Button (9)
-            const menuBtn = globalGp.buttons[0]?.pressed || globalGp.buttons[9]?.pressed;
-            if (menuBtn && !prevMenuBtnPressed) {
-                if ((state === 'MENU' || state === 'GAMEOVER') && 
-                    authOverlay.classList.contains('hidden') && 
-                    settingsModal.classList.contains('hidden') && 
-                    leaderboardModal.classList.contains('hidden') && 
-                    creditsModal.classList.contains('hidden')) {
-                    startBtn.click();
-                }
+        if (menuBtn && !prevMenuBtnPressed) {
+            if ((state === 'MENU' || state === 'GAMEOVER') && 
+                authOverlay.classList.contains('hidden') && 
+                settingsModal.classList.contains('hidden') && 
+                leaderboardModal.classList.contains('hidden') && 
+                creditsModal.classList.contains('hidden')) {
+                startBtn.click();
             }
-            prevMenuBtnPressed = menuBtn;
         }
+        prevMenuBtnPressed = menuBtn;
 
         // Calculate global time scale for superhot mode first
         let globalTimeScale = 1.0;
@@ -3028,14 +3075,11 @@
             }
         }
 
-        // Draw neon elements with additive 'lighter' blending
+        // Draw everything
         geoms.forEach(g => g.draw(ctx));
         particles.forEach(p => p.draw(ctx));
         bullets.forEach(b => b.draw(ctx));
         enemies.forEach(e => e.draw(ctx));
-
-        // Switch to source-over so the player is never washed out by additive blending
-        ctx.globalCompositeOperation = 'source-over';
         if (player && state === 'PLAYING') player.draw(ctx);
 
         ctx.restore(); // Restore shake translation
@@ -3049,42 +3093,8 @@
         }
     }
 
-    // ── Geometry Wars menu keyboard selector ──
-    (function() {
-        const menuBtns = () => document.querySelectorAll('.menu-buttons button:not([style*="display:none"]):not(.hidden)');
-        let selIdx = 0;
-
-        function updateSelection() {
-            const btns = menuBtns();
-            btns.forEach((b, i) => b.classList.toggle('gw-selected', i === selIdx));
-        }
-
-        document.addEventListener('keydown', (e) => {
-            if (overlay.classList.contains('hidden')) return;
-            const btns = [...menuBtns()];
-            if (!btns.length) return;
-            if (e.key === 'ArrowDown' || e.key === 's') {
-                e.preventDefault();
-                selIdx = (selIdx + 1) % btns.length;
-                updateSelection();
-            } else if (e.key === 'ArrowUp' || e.key === 'w') {
-                e.preventDefault();
-                selIdx = (selIdx - 1 + btns.length) % btns.length;
-                updateSelection();
-            } else if (e.key === 'Enter') {
-                btns[selIdx]?.click();
-            }
-        });
-
-        // Mouse hover also moves selector
-        document.addEventListener('mouseover', (e) => {
-            const btn = e.target.closest('.menu-buttons button');
-            if (!btn) return;
-            const btns = [...menuBtns()];
-            const idx = btns.indexOf(btn);
-            if (idx >= 0) { selIdx = idx; updateSelection(); }
-        });
-    })();
+    // Start loop
+    loop();
 
 </script>
 </body>
