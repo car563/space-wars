@@ -94,7 +94,7 @@
             line-height: 1;
         }
 
-        #gw-title-main {
+        #title-text {
             font-size: clamp(2.8rem, 6vw, 5rem);
             font-weight: 900;
             letter-spacing: 0.06em;
@@ -102,8 +102,7 @@
             text-shadow:
                 0 0 8px #05ff6a,
                 0 0 22px #05ff6a,
-                0 0 55px #00cc44,
-                0 0 100px #006622;
+                0 0 55px #00cc44;
             -webkit-text-stroke: 1.5px #00ff55;
             display: block;
             animation: gwPulse 3.5s ease-in-out infinite;
@@ -120,8 +119,8 @@
         }
 
         @keyframes gwPulse {
-            0%,100% { text-shadow: 0 0 8px #05ff6a, 0 0 22px #05ff6a, 0 0 55px #00cc44, 0 0 100px #006622; }
-            50%      { text-shadow: 0 0 14px #05ff6a, 0 0 38px #05ff6a, 0 0 80px #00ff55, 0 0 140px #00aa33; }
+            0%,100% { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 22px currentColor); }
+            50%      { filter: drop-shadow(0 0 18px currentColor) drop-shadow(0 0 45px currentColor); }
         }
 
         h1 {
@@ -525,7 +524,7 @@
     <div id="overlay">
         <!-- Geometry Wars-style title -->
         <div id="gw-title-block">
-            <span id="gw-title-main">SPACE WARS</span>
+            <span id="title-text">SPACE WARS</span>
             <span id="gw-title-sub">RETRO&nbsp;&nbsp;EVOLVED</span>
         </div>
 
@@ -1929,25 +1928,40 @@
                 ctx.globalAlpha = 0.3;
             }
 
-            // Draw Ship (Claw shape)
+            // Draw Ship — glow pass then crisp pass
+            const drawColor = isGodMode ? adminColorPicker.value : this.color;
+
+            ctx.shadowColor = drawColor;
+            ctx.shadowBlur = 20;
             ctx.beginPath();
             ctx.moveTo(15, 0);
             ctx.lineTo(-10, 10);
             ctx.lineTo(-5, 0);
             ctx.lineTo(-10, -10);
             ctx.closePath();
-
-            // Match God Mode color to dynamic admin panel color
-            const drawColor = isGodMode ? adminColorPicker.value : this.color;
             ctx.strokeStyle = drawColor;
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            ctx.shadowBlur = 0;
+            ctx.beginPath();
+            ctx.moveTo(15, 0);
+            ctx.lineTo(-10, 10);
+            ctx.lineTo(-5, 0);
+            ctx.lineTo(-10, -10);
+            ctx.closePath();
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
 
             // Core
             ctx.beginPath();
-            ctx.arc(-2, 0, 3, 0, Math.PI * 2);
+            ctx.arc(-2, 0, 4, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = '#ffffff';
+            ctx.shadowBlur = 10;
             ctx.fill();
+            ctx.shadowBlur = 0;
 
             if (isForcefield) {
                 ctx.beginPath();
@@ -3014,11 +3028,14 @@
             }
         }
 
-        // Draw everything
+        // Draw neon elements with additive 'lighter' blending
         geoms.forEach(g => g.draw(ctx));
         particles.forEach(p => p.draw(ctx));
         bullets.forEach(b => b.draw(ctx));
         enemies.forEach(e => e.draw(ctx));
+
+        // Switch to source-over so the player is never washed out by additive blending
+        ctx.globalCompositeOperation = 'source-over';
         if (player && state === 'PLAYING') player.draw(ctx);
 
         ctx.restore(); // Restore shake translation
