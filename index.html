@@ -987,6 +987,8 @@
     };
     const mouse = { x: width/2, y: height/2, down: false };
     let lastAimMode = 'mouse';
+    let lastMouseX = width/2;
+    let lastMouseY = height/2;
 
     // Prevent right click menu from popping up
     window.addEventListener('contextmenu', e => e.preventDefault());
@@ -1007,11 +1009,18 @@
             keys[e.key.toLowerCase()] = false;
         }
     });
+    
     window.addEventListener('mousemove', (e) => {
-        lastAimMode = 'mouse';
+        // Anti-jitter: Only switch to mouse aim if the mouse actually moved a decent amount
+        if (Math.abs(e.clientX - lastMouseX) > 2 || Math.abs(e.clientY - lastMouseY) > 2) {
+            lastAimMode = 'mouse';
+        }
         mouse.x = e.clientX;
         mouse.y = e.clientY;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
     });
+
     window.addEventListener('mousedown', (e) => {
         if(e.button === 0) mouse.down = true; // Left click
 
@@ -1025,6 +1034,57 @@
     });
     window.addEventListener('mouseup', (e) => {
         if(e.button === 0) mouse.down = false;
+    });
+
+    // Controller Connection Notifications
+    window.addEventListener("gamepadconnected", (e) => {
+        console.log("Gamepad connected:", e.gamepad.id);
+        const msg = document.createElement('div');
+        msg.innerText = `🎮 Controller Connected!`;
+        msg.style.position = 'absolute';
+        msg.style.bottom = '20px';
+        msg.style.right = '20px';
+        msg.style.color = '#00ff00';
+        msg.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        msg.style.padding = '15px 25px';
+        msg.style.border = '2px solid #00ff00';
+        msg.style.borderRadius = '5px';
+        msg.style.fontFamily = "'Orbitron', sans-serif";
+        msg.style.zIndex = '1000';
+        msg.style.boxShadow = '0 0 15px rgba(0, 255, 0, 0.5)';
+        msg.style.pointerEvents = 'none';
+        msg.style.transition = 'opacity 0.5s';
+        document.body.appendChild(msg);
+        
+        setTimeout(() => {
+            msg.style.opacity = '0';
+            setTimeout(() => msg.remove(), 500);
+        }, 3000);
+    });
+
+    window.addEventListener("gamepaddisconnected", (e) => {
+        console.log("Gamepad disconnected:", e.gamepad.id);
+        const msg = document.createElement('div');
+        msg.innerText = `🎮 Controller Disconnected`;
+        msg.style.position = 'absolute';
+        msg.style.bottom = '20px';
+        msg.style.right = '20px';
+        msg.style.color = '#ff0044';
+        msg.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        msg.style.padding = '15px 25px';
+        msg.style.border = '2px solid #ff0044';
+        msg.style.borderRadius = '5px';
+        msg.style.fontFamily = "'Orbitron', sans-serif";
+        msg.style.zIndex = '1000';
+        msg.style.boxShadow = '0 0 15px rgba(255, 0, 68, 0.5)';
+        msg.style.pointerEvents = 'none';
+        msg.style.transition = 'opacity 0.5s';
+        document.body.appendChild(msg);
+        
+        setTimeout(() => {
+            msg.style.opacity = '0';
+            setTimeout(() => msg.remove(), 500);
+        }, 3000);
     });
 
     // --- MENU MODAL LOGIC ---
@@ -1500,7 +1560,16 @@
             if (keys.d || keys.ArrowRight) dx += 1;
 
             let isGamepadShooting = false;
-            let gp = navigator.getGamepads ? navigator.getGamepads()[0] : null;
+            let gp = null;
+            if (navigator.getGamepads) {
+                const gamepads = navigator.getGamepads();
+                for (let i = 0; i < gamepads.length; i++) {
+                    if (gamepads[i] && gamepads[i].connected) {
+                        gp = gamepads[i];
+                        break;
+                    }
+                }
+            }
 
             if (gp) {
                 const deadzone = 0.2;
@@ -2666,10 +2735,39 @@
 
     startBtn.addEventListener('click', startGame);
 
+    let prevMenuBtnPressed = false;
+
     // --- MAIN LOOP ---
 
     function loop() {
         requestAnimationFrame(loop);
+
+        // Global Gamepad check for Menu navigation
+        let globalGp = null;
+        if (navigator.getGamepads) {
+            const gamepads = navigator.getGamepads();
+            for (let i = 0; i < gamepads.length; i++) {
+                if (gamepads[i] && gamepads[i].connected) {
+                    globalGp = gamepads[i];
+                    break;
+                }
+            }
+        }
+
+        if (globalGp) {
+            // A Button (0) or Start Button (9)
+            const menuBtn = globalGp.buttons[0]?.pressed || globalGp.buttons[9]?.pressed;
+            if (menuBtn && !prevMenuBtnPressed) {
+                if ((state === 'MENU' || state === 'GAMEOVER') && 
+                    authOverlay.classList.contains('hidden') && 
+                    settingsModal.classList.contains('hidden') && 
+                    leaderboardModal.classList.contains('hidden') && 
+                    creditsModal.classList.contains('hidden')) {
+                    startBtn.click();
+                }
+            }
+            prevMenuBtnPressed = menuBtn;
+        }
 
         // Calculate global time scale for superhot mode first
         let globalTimeScale = 1.0;
