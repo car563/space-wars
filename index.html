@@ -78,8 +78,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at center, rgba(0, 30, 40, 0.6) 0%, rgba(0, 0, 0, 0.8) 60%, rgba(0, 0, 0, 0.95) 100%);
-            backdrop-filter: blur(4px);
+            background: radial-gradient(ellipse at center, rgba(0, 20, 10, 0.45) 0%, rgba(0, 0, 0, 0.7) 55%, rgba(0, 0, 0, 0.92) 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -88,10 +87,41 @@
             z-index: 10;
         }
 
-        @keyframes pulseGlow {
-            0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
-            50% { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #00ffff; transform: scale(1.02); }
-            100% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff; transform: scale(1); }
+        /* ── GW Title Block ── */
+        #gw-title-block {
+            text-align: center;
+            margin-bottom: 48px;
+            line-height: 1;
+        }
+
+        #gw-title-main {
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            color: #05ff6a;
+            text-shadow:
+                0 0 8px #05ff6a,
+                0 0 22px #05ff6a,
+                0 0 55px #00cc44,
+                0 0 100px #006622;
+            -webkit-text-stroke: 1.5px #00ff55;
+            display: block;
+            animation: gwPulse 3.5s ease-in-out infinite;
+        }
+
+        #gw-title-sub {
+            display: block;
+            font-size: clamp(0.85rem, 2vw, 1.3rem);
+            font-weight: 400;
+            letter-spacing: 0.55em;
+            color: #00dd55;
+            text-shadow: 0 0 10px #00cc44, 0 0 28px #006622;
+            margin-top: 6px;
+        }
+
+        @keyframes gwPulse {
+            0%,100% { text-shadow: 0 0 8px #05ff6a, 0 0 22px #05ff6a, 0 0 55px #00cc44, 0 0 100px #006622; }
+            50%      { text-shadow: 0 0 14px #05ff6a, 0 0 38px #05ff6a, 0 0 80px #00ff55, 0 0 140px #00aa33; }
         }
 
         h1 {
@@ -99,7 +129,6 @@
             margin: 0 0 10px 0;
             color: #fff;
             text-align: center;
-            animation: pulseGlow 3s ease-in-out infinite;
         }
 
         p {
@@ -108,6 +137,14 @@
             color: #ccc;
             text-align: center;
             line-height: 1.5;
+        }
+
+        /* ── GW-style menu list ── */
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            align-items: center;
         }
 
         button {
@@ -129,6 +166,49 @@
             background: rgba(0, 255, 255, 0.2);
             box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), inset 0 0 25px rgba(0, 255, 255, 0.5);
             transform: scale(1.05);
+        }
+
+        /* Override the .menu-buttons buttons to be GW plain-text style */
+        .menu-buttons button {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 10px 0;
+            font-size: clamp(1rem, 2.2vw, 1.35rem);
+            font-weight: 400;
+            letter-spacing: 0.18em;
+            color: #33ee77;
+            text-shadow: 0 0 8px #00cc44, 0 0 18px #00aa33;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.15s, text-shadow 0.15s;
+            border-radius: 0;
+            width: auto;
+            position: relative;
+        }
+
+        .menu-buttons button:hover,
+        .menu-buttons button.gw-selected {
+            color: #ffffff;
+            text-shadow: 0 0 12px #88ffaa, 0 0 30px #00ff55, 0 0 55px #00cc44;
+            transform: none;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        /* Red star selector next to hovered item */
+        .menu-buttons button.gw-selected::before {
+            content: '✦';
+            position: absolute;
+            left: -1.6em;
+            color: #ff2244;
+            text-shadow: 0 0 10px #ff0033, 0 0 22px #ff0033;
+            animation: selectorBlink 0.9s ease-in-out infinite;
+        }
+
+        @keyframes selectorBlink {
+            0%,100% { opacity: 1; }
+            50%      { opacity: 0.45; }
         }
 
         #cheat-input {
@@ -443,12 +523,14 @@
     </div>
 
     <div id="overlay">
-        <h1 id="title-text">SPACE WARS</h1>
-        <p id="instructions">
-            WASD / L-Stick to Move <br>
-            Mouse / R-Stick to Aim <br>
-            Left Click / RT to Shoot <br>
-            Spacebar / LT to Use Bomb <br>
+        <!-- Geometry Wars-style title -->
+        <div id="gw-title-block">
+            <span id="gw-title-main">SPACE WARS</span>
+            <span id="gw-title-sub">RETRO&nbsp;&nbsp;EVOLVED</span>
+        </div>
+
+        <p id="instructions" style="font-size:0.85rem; letter-spacing:0.08em; color:#44aa66; text-shadow:0 0 8px #004422; margin-bottom:36px;">
+            WASD / L-Stick to Move &nbsp;·&nbsp; Mouse / R-Stick to Aim &nbsp;·&nbsp; Click / RT to Shoot &nbsp;·&nbsp; Space / LT for Bomb
         </p>
 
         <div id="game-over-submit" class="hidden">
@@ -460,8 +542,8 @@
         </div>
 
         <div class="menu-buttons">
-            <button id="start-btn">START GAME</button>
-            <button id="leaderboard-btn">LEADERBOARD</button>
+            <button id="start-btn" class="gw-selected">PLAY GAME</button>
+            <button id="leaderboard-btn">LEADERBOARDS</button>
             <button id="settings-btn">SETTINGS</button>
             <button id="credits-btn">CREDITS</button>
         </div>
@@ -2950,8 +3032,42 @@
         }
     }
 
-    // Start loop
-    loop();
+    // ── Geometry Wars menu keyboard selector ──
+    (function() {
+        const menuBtns = () => document.querySelectorAll('.menu-buttons button:not([style*="display:none"]):not(.hidden)');
+        let selIdx = 0;
+
+        function updateSelection() {
+            const btns = menuBtns();
+            btns.forEach((b, i) => b.classList.toggle('gw-selected', i === selIdx));
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (overlay.classList.contains('hidden')) return;
+            const btns = [...menuBtns()];
+            if (!btns.length) return;
+            if (e.key === 'ArrowDown' || e.key === 's') {
+                e.preventDefault();
+                selIdx = (selIdx + 1) % btns.length;
+                updateSelection();
+            } else if (e.key === 'ArrowUp' || e.key === 'w') {
+                e.preventDefault();
+                selIdx = (selIdx - 1 + btns.length) % btns.length;
+                updateSelection();
+            } else if (e.key === 'Enter') {
+                btns[selIdx]?.click();
+            }
+        });
+
+        // Mouse hover also moves selector
+        document.addEventListener('mouseover', (e) => {
+            const btn = e.target.closest('.menu-buttons button');
+            if (!btn) return;
+            const btns = [...menuBtns()];
+            const idx = btns.indexOf(btn);
+            if (idx >= 0) { selIdx = idx; updateSelection(); }
+        });
+    })();
 
 </script>
 </body>
