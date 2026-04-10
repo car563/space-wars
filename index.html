@@ -751,6 +751,7 @@
                 <button id="btn-addscore">+10,000 Score</button>
                 <button id="btn-jackpot">Jackpot (+1M Score)</button>
                 <button id="btn-multiplier">+10x Multiplier</button>
+                <button id="btn-multiplier-10k">+10,000x Multiplier</button>
                 <button id="btn-collectgeoms">Collect All Geoms</button>
                 <button id="btn-rain">Make It Rain Geoms</button>
                 <button id="btn-nuke">Nuke Screen (Yields Score)</button>
@@ -844,6 +845,7 @@
     const btnAddBombs = document.getElementById('btn-addbombs');
     const btnAddScore = document.getElementById('btn-addscore');
     const btnMultiplier = document.getElementById('btn-multiplier');
+    const btnMultiplier10k = document.getElementById('btn-multiplier-10k');
     const btnSwarm = document.getElementById('btn-swarm');
     const btnSpeed = document.getElementById('btn-speed');
     const btnAdminGun = document.getElementById('btn-admingun');
@@ -1975,6 +1977,12 @@
 
     btnMultiplier.addEventListener('click', () => {
         multiplier += 10;
+        geomCount = 0;
+        updateUI();
+    });
+
+    btnMultiplier10k.addEventListener('click', () => {
+        multiplier += 10000;
         geomCount = 0;
         updateUI();
     });
