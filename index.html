@@ -589,6 +589,8 @@
             <div id="menu-high-score">Personal Best: 0</div>
             <div id="menu-total-points">Balance: 0 PTS</div>
 
+            <button id="daily-reward-btn" style="margin-bottom: 25px; font-size: 1.2rem; padding: 10px 20px; background: rgba(50, 205, 50, 0.1); border-color: #32cd32; color: #32cd32; text-shadow: 0 0 8px #32cd32; box-shadow: 0 0 10px rgba(50, 205, 50, 0.3);">CLAIM DAILY 50,000 PTS</button>
+
             <p id="instructions">
                 WASD / L-Stick to Move <br>
                 Mouse / R-Stick to Aim <br>
@@ -812,6 +814,7 @@
     const menuHighScoreEl = document.getElementById('menu-high-score');
     const menuTotalPointsEl = document.getElementById('menu-total-points');
     const menuTipsEl = document.getElementById('menu-tips');
+    const dailyRewardBtn = document.getElementById('daily-reward-btn');
 
     // New Menu Elements
     const leaderboardBtn = document.getElementById('leaderboard-btn');
@@ -946,6 +949,8 @@
     
     let totalPoints = parseInt(localStorage.getItem('spaceWarsTotalPoints')) || 0;
     menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+
+    let lastDailyReward = parseInt(localStorage.getItem('spaceWarsDailyReward')) || 0;
 
     let unlockedShips = JSON.parse(localStorage.getItem('spaceWarsUnlockedShips')) || [0];
     let selectedShipType = parseInt(localStorage.getItem('spaceWarsShipType')) || 0;
@@ -1377,10 +1382,15 @@
                     localHighScore = data.localHighScore;
                     localStorage.setItem('spaceWarsHighScore', localHighScore);
                 }
+                if (data.lastDailyReward !== undefined) {
+                    lastDailyReward = data.lastDailyReward;
+                    localStorage.setItem('spaceWarsDailyReward', lastDailyReward);
+                }
 
                 // Update UI with loaded data
                 menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
                 menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+                updateDailyRewardUI();
                 renderShipSelect();
             }
         } catch (e) {
@@ -1397,6 +1407,7 @@
                 unlockedShips: unlockedShips,
                 selectedShipType: selectedShipType,
                 localHighScore: localHighScore,
+                lastDailyReward: lastDailyReward,
                 lastUpdated: Date.now()
             }, { merge: true });
         } catch (e) {
@@ -1455,6 +1466,55 @@
         savedUsername = "Guest_" + Math.floor(Math.random() * 9999);
         isGuest = true;
         authOverlay.classList.add('hidden');
+    });
+
+    // --- DAILY REWARD LOGIC ---
+    function updateDailyRewardUI() {
+        if (!dailyRewardBtn) return;
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const timePassed = now - lastDailyReward;
+        
+        if (timePassed >= oneDay) {
+            dailyRewardBtn.innerText = "CLAIM DAILY 50,000 PTS";
+            dailyRewardBtn.disabled = false;
+            dailyRewardBtn.style.opacity = '1';
+            dailyRewardBtn.style.cursor = 'pointer';
+            dailyRewardBtn.style.background = 'rgba(50, 205, 50, 0.1)';
+        } else {
+            const timeLeft = oneDay - timePassed;
+            const h = Math.floor(timeLeft / (1000 * 60 * 60));
+            const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((timeLeft % (1000 * 60)) / 1000);
+            dailyRewardBtn.innerText = `NEXT REWARD: ${h}h ${m}m ${s}s`;
+            dailyRewardBtn.disabled = true;
+            dailyRewardBtn.style.opacity = '0.5';
+            dailyRewardBtn.style.cursor = 'not-allowed';
+            dailyRewardBtn.style.background = 'transparent';
+        }
+    }
+    
+    // Update it every second to keep the timer accurate
+    setInterval(updateDailyRewardUI, 1000); 
+    updateDailyRewardUI();
+
+    dailyRewardBtn.addEventListener('click', () => {
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        if (now - lastDailyReward >= oneDay) {
+            initAudio();
+            playSound('titan'); // A satisfying chime
+            
+            totalPoints += 50000;
+            lastDailyReward = now;
+            
+            localStorage.setItem('spaceWarsTotalPoints', totalPoints);
+            localStorage.setItem('spaceWarsDailyReward', lastDailyReward);
+            menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+            
+            saveGameData();
+            updateDailyRewardUI();
+        }
     });
 
     function setupLeaderboardListener() {
