@@ -594,6 +594,7 @@
                 Mouse / R-Stick to Aim <br>
                 Left Click / RT to Shoot <br>
                 Spacebar / LT to Use Bomb <br>
+                ESC / Start to Pause <br>
             </p>
 
             <div id="game-over-submit" class="hidden">
@@ -1543,6 +1544,16 @@
             if(e.key === ' ' && state === 'PLAYING') useBomb();
         }
         
+        if (e.key === 'Escape') {
+            if (state === 'PLAYING') {
+                state = 'PAUSED';
+                stopMusic();
+            } else if (state === 'PAUSED') {
+                state = 'PLAYING';
+                if (settingMusic) startMusic();
+            }
+        }
+
         // Toggle Admin Panel with the Backtick (`) key
         if (e.key === '`' && adminUnlocked) {
             adminPanel.classList.toggle('hidden');
@@ -3893,6 +3904,7 @@
             Mouse / R-Stick to Aim <br>
             Left Click / RT to Shoot <br>
             Spacebar / LT to Use Bomb <br>
+            ESC / Start to Pause <br>
         `;
         
         mainMenuBtn.classList.add('hidden');
@@ -3925,6 +3937,7 @@
             Mouse / R-Stick to Aim <br>
             Left Click / RT to Shoot <br>
             Spacebar / LT to Use Bomb <br>
+            ESC / Start to Pause <br>
         `;
         enemies = [];
         bullets = [];
@@ -3933,6 +3946,7 @@
     });
 
     let prevMenuBtnPressed = false;
+    let prevPauseBtnPressed = false;
 
     // --- MAIN LOOP ---
 
@@ -3941,6 +3955,7 @@
 
         // Global Gamepad check for Menu navigation (Omnidirectional polling)
         let menuBtn = false;
+        let pauseBtn = false;
         if (navigator.getGamepads) {
             const gamepads = navigator.getGamepads();
             for (let i = 0; i < gamepads.length; i++) {
@@ -3950,9 +3965,24 @@
                     if ((gp.buttons.length >= 1 && gp.buttons[0]?.pressed) || (gp.buttons.length >= 10 && gp.buttons[9]?.pressed)) {
                         menuBtn = true;
                     }
+                    // Start Button specifically for Pause (9)
+                    if (gp.buttons.length >= 10 && gp.buttons[9]?.pressed) {
+                        pauseBtn = true;
+                    }
                 }
             }
         }
+
+        if (pauseBtn && !prevPauseBtnPressed) {
+            if (state === 'PLAYING') {
+                state = 'PAUSED';
+                stopMusic();
+            } else if (state === 'PAUSED') {
+                state = 'PLAYING';
+                if (settingMusic) startMusic();
+            }
+        }
+        prevPauseBtnPressed = pauseBtn;
 
         if (menuBtn && !prevMenuBtnPressed) {
             if ((state === 'MENU' || state === 'GAMEOVER') && 
@@ -3967,7 +3997,9 @@
 
         // Calculate global time scale for superhot mode first
         let globalTimeScale = 1.0;
-        if (state === 'PLAYING' && isSuperhotMode) {
+        if (state === 'PAUSED') {
+            globalTimeScale = 0;
+        } else if (state === 'PLAYING' && isSuperhotMode) {
             const isPlayerMoving = keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire;
             globalTimeScale = isPlayerMoving ? 1.0 : 0.15;
         }
@@ -4117,7 +4149,7 @@
 
         // Always update particles and geoms with backward loops for memory efficiency
         for (let i = particles.length - 1; i >= 0; i--) {
-            particles[i].update(state === 'PLAYING' && isSuperhotMode ? (keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire ? 1.0 : 0.15) : 1.0);
+            particles[i].update(globalTimeScale);
             if (particles[i].life <= 0) {
                 particles[i] = particles[particles.length - 1];
                 particles.pop();
@@ -4125,7 +4157,7 @@
         }
         
         for (let i = geoms.length - 1; i >= 0; i--) {
-            geoms[i].update(state === 'PLAYING' && isSuperhotMode ? (keys.w || keys.a || keys.s || keys.d || keys.ArrowUp || keys.ArrowDown || keys.ArrowLeft || keys.ArrowRight || mouse.down || isAutoFire ? 1.0 : 0.15) : 1.0);
+            geoms[i].update(globalTimeScale);
             if (geoms[i].life <= 0) {
                 geoms[i] = geoms[geoms.length - 1];
                 geoms.pop();
@@ -4137,16 +4169,38 @@
         particles.forEach(p => p.draw(ctx));
         bullets.forEach(b => b.draw(ctx));
         enemies.forEach(e => e.draw(ctx));
-        if (player && state === 'PLAYING') player.draw(ctx);
+        if (player && (state === 'PLAYING' || state === 'PAUSED')) player.draw(ctx);
 
         ctx.restore(); // Restore shake translation
         ctx.globalCompositeOperation = 'source-over';
 
         // Bomb Flash Overlay
-        if (bombFlash > 0) {
+        if (bombFlash > 0 && state !== 'PAUSED') {
             ctx.fillStyle = `rgba(255, 255, 255, ${bombFlash})`;
             ctx.fillRect(0, 0, width, height);
             bombFlash -= 0.05;
+        } else if (bombFlash > 0 && state === 'PAUSED') {
+            ctx.fillStyle = `rgba(255, 255, 255, ${bombFlash})`;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        // Pause Overlay
+        if (state === 'PAUSED') {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 4rem Orbitron';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = '#00ffff';
+            ctx.shadowBlur = 20;
+            ctx.fillText("PAUSED", width / 2, height / 2 - 20);
+            
+            ctx.font = '1.5rem Orbitron';
+            ctx.shadowBlur = 10;
+            ctx.fillText("Press ESC to Resume", width / 2, height / 2 + 40);
+            ctx.shadowBlur = 0; // reset
         }
     }
 
