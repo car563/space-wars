@@ -671,6 +671,11 @@
                 <div class="ship-name">Saucer</div>
                 <div class="ship-status">1,000,000 PTS</div>
             </button>
+            <button class="ship-btn" data-ship="4" data-price="50000">
+                <canvas class="ship-preview" width="60" height="60"></canvas>
+                <div class="ship-name">Pizza</div>
+                <div class="ship-status">50,000 PTS</div>
+            </button>
         </div>
         <button id="close-ship-select-btn" class="close-btn">CLOSE</button>
     </div>
@@ -1827,6 +1832,22 @@
             ctx.beginPath();
             ctx.arc(0, 0, 8, Math.PI*1.1, Math.PI*0.9, true); // Inner cockpit detail
             ctx.strokeStyle = color; ctx.lineWidth = 1; ctx.stroke();
+        } else if (type === 4) { // Pizza
+            // Main slice
+            ctx.moveTo(18, 0); ctx.lineTo(-12, 12); ctx.lineTo(-12, -12); ctx.closePath();
+            ctx.fillStyle = 'rgba(255, 165, 0, 0.2)'; // Cheese tint
+            ctx.fill();
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+            
+            // Crust
+            ctx.beginPath();
+            ctx.moveTo(-12, -14); ctx.quadraticCurveTo(-18, 0, -12, 14);
+            ctx.strokeStyle = '#d2b48c'; ctx.lineWidth = 3; ctx.stroke();
+            
+            // Pepperoni
+            ctx.beginPath(); ctx.arc(4, 0, 3, 0, Math.PI*2); ctx.fillStyle = '#ff3333'; ctx.fill();
+            ctx.beginPath(); ctx.arc(-5, -6, 2.5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(-4, 6, 2.5, 0, Math.PI*2); ctx.fill();
         }
 
         // Core
