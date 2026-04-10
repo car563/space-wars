@@ -1316,6 +1316,7 @@
                     setupLeaderboardListener();
                     authStatus.innerText = "Authenticating Profile...";
                     await checkUserProfile(user.uid);
+                    await loadGameData(user.uid); // Load progress from Cloud!
                 }
             });
         } else {
@@ -1350,6 +1351,56 @@
             setTimeout(() => {
                 authOverlay.classList.add('hidden'); // Fallback to guest mode essentially
             }, 2000);
+        }
+    }
+
+    // --- CLOUD SAVE SYSTEM ---
+    async function loadGameData(uid) {
+        try {
+            const saveRef = doc(db, 'artifacts', appId, 'users', uid, 'saveData', 'progress');
+            const saveSnap = await getDoc(saveRef);
+            if (saveSnap.exists()) {
+                const data = saveSnap.data();
+                if (data.totalPoints !== undefined) {
+                    totalPoints = data.totalPoints;
+                    localStorage.setItem('spaceWarsTotalPoints', totalPoints);
+                }
+                if (data.unlockedShips !== undefined) {
+                    unlockedShips = data.unlockedShips;
+                    localStorage.setItem('spaceWarsUnlockedShips', JSON.stringify(unlockedShips));
+                }
+                if (data.selectedShipType !== undefined) {
+                    selectedShipType = data.selectedShipType;
+                    localStorage.setItem('spaceWarsShipType', selectedShipType);
+                }
+                if (data.localHighScore !== undefined) {
+                    localHighScore = data.localHighScore;
+                    localStorage.setItem('spaceWarsHighScore', localHighScore);
+                }
+
+                // Update UI with loaded data
+                menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
+                menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+                renderShipSelect();
+            }
+        } catch (e) {
+            console.error("Error loading cloud save data:", e);
+        }
+    }
+
+    async function saveGameData() {
+        if (!currentUser || !db) return;
+        try {
+            const saveRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'saveData', 'progress');
+            await setDoc(saveRef, {
+                totalPoints: totalPoints,
+                unlockedShips: unlockedShips,
+                selectedShipType: selectedShipType,
+                localHighScore: localHighScore,
+                lastUpdated: Date.now()
+            }, { merge: true });
+        } catch (e) {
+            console.error("Error saving to cloud:", e);
         }
     }
 
@@ -1792,6 +1843,7 @@
                 // Equip owned ship
                 selectedShipType = shipId;
                 localStorage.setItem('spaceWarsShipType', selectedShipType);
+                saveGameData(); // Save to cloud
                 renderShipSelect();
             } else {
                 // Attempt to buy
@@ -1807,6 +1859,7 @@
                     selectedShipType = shipId;
                     localStorage.setItem('spaceWarsShipType', selectedShipType);
                     
+                    saveGameData(); // Save to cloud
                     renderShipSelect();
                 } else {
                     // Flash red for insufficient funds
@@ -3083,8 +3136,8 @@
         constructor(x, y, type) {
             this.x = x;
             this.y = y;
-            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership, 8: Jumper, 9: Slither, 10: Splitter, 11: Titan, 12: Dodger
-            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : 10;
+            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership, 8: Jumper, 9: Slither, 10: Splitter, 11: Titan, 12: Dodger, 13: Loot Bug
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : 10;
             this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
@@ -3167,6 +3220,11 @@
                 this.speed = 1.2 + Math.random() * difficulty * 0.3; // Slower base speed
                 this.hp = 2; // Takes two hits
                 this.scoreValue = 350;
+            } else if (type === 13) {
+                this.color = '#ffd700'; // Gold Loot Bug
+                this.speed = 3.0 + Math.random() * difficulty * 0.5;
+                this.hp = 3;
+                this.scoreValue = 1500;
             }
         }
 
@@ -3381,6 +3439,43 @@
                 this.vx += (desiredVx + dodgeVx - this.vx) * 0.1 * timeScale;
                 this.vy += (desiredVy + dodgeVy - this.vy) * 0.1 * timeScale;
                 this.angle += 0.1 * timeScale; // Spin while moving
+            } else if (this.type === 13) {
+                // Loot Bug: Runs away from player erratically
+                const dx = this.x - targetX; 
+                const dy = this.y - targetY;
+                const distSq = dx*dx + dy*dy;
+                
+                // If the player is somewhat close, run away fast
+                if (distSq < 160000) { // 400px radius
+                    const dist = Math.sqrt(distSq) || 1;
+                    this.angle += 0.2 * timeScale; // Spin rapidly
+                    const wiggleX = Math.cos(this.angle) * 1.5;
+                    const wiggleY = Math.sin(this.angle) * 1.5;
+                    
+                    this.vx = (dx / dist) * this.speed + wiggleX;
+                    this.vy = (dy / dist) * this.speed + wiggleY;
+                } else {
+                    // Coast and wander if player is far away
+                    this.vx *= 0.95;
+                    this.vy *= 0.95;
+                    this.angle += 0.05 * timeScale;
+                }
+
+                // Force it to stay on screen so the player can actually catch it!
+                if (!isScreenWrap) {
+                    if (this.x < this.radius) { this.x = this.radius; this.vx = Math.abs(this.vx); }
+                    if (this.x > width - this.radius) { this.x = width - this.radius; this.vx = -Math.abs(this.vx); }
+                    if (this.y < this.radius) { this.y = this.radius; this.vy = Math.abs(this.vy); }
+                    if (this.y > height - this.radius) { this.y = height - this.radius; this.vy = -Math.abs(this.vy); }
+                }
+
+                // Sparkling trail
+                if (settingHighParticles && Math.random() > 0.5) {
+                    let p = new Particle(this.x + (Math.random()*16-8), this.y + (Math.random()*16-8), '#ffd700', 0.5);
+                    p.size = 2;
+                    p.decay = 0.02; // Fade faster
+                    particles.push(p);
+                }
             }
 
             if (player && isRepellent) {
@@ -3516,6 +3611,12 @@
                 ctx.moveTo(-10, -10); ctx.lineTo(10, 10); 
                 ctx.moveTo(10, -10); ctx.lineTo(-10, 10);
                 if (this.hp < 2) ctx.setLineDash([2, 2]);
+            } else if (this.type === 13) {
+                // Diamond shape
+                ctx.moveTo(12, 0); ctx.lineTo(0, 15); ctx.lineTo(-12, 0); ctx.lineTo(0, -15);
+                if (this.hp < 3) ctx.setLineDash([2, 2]);
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+                ctx.fill();
             }
             
             if (this.type !== 7 && this.type !== 11) {
@@ -3669,6 +3770,8 @@
             type = 7; 
         } else if (difficulty > 2.8 && rand > 0.93) {
             type = 8; // White Jumper
+        } else if (difficulty > 1.5 && rand > 0.90) {
+            type = 13; // Golden Loot Bug (Rare)
         } else if (difficulty > 2.5 && rand > 0.86) {
             type = 6; // Red Dasher (Lunge attack)
         } else if (difficulty > 2.2 && rand > 0.78) {
@@ -3749,6 +3852,7 @@
                     localStorage.setItem('spaceWarsTotalPoints', totalPoints);
                     menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
                 }
+                saveGameData(); // Save to Cloud
             }
 
             let htmlStr = `Final Score: <span style="color:#fff; font-size: 2rem;">${score}</span>`;
@@ -3897,14 +4001,14 @@
             const e = enemies[j];
             if (e.hp <= 0) {
                 // Kill enemy
-                createExplosion(e.x, e.y, e.color, (e.type === 11 ? 200 : e.type === 7 ? 50 : 15));
+                createExplosion(e.x, e.y, e.color, (e.type === 11 ? 200 : e.type === 7 ? 50 : e.type === 13 ? 40 : 15));
                 playSound(e.type === 11 ? 'titan' : 'enemy');
                 score += e.scoreValue * multiplier;
                 
                 // Drop Geom (Motherships drop 5, Titans drop 50)
-                const geomDrops = e.type === 11 ? 50 : e.type === 7 ? 5 : 1;
+                const geomDrops = e.type === 11 ? 50 : e.type === 7 ? 5 : e.type === 13 ? 20 : 1;
                 for(let g = 0; g < geomDrops; g++) {
-                    if (Math.random() > 0.2 || e.type === 7 || e.type === 11) { 
+                    if (Math.random() > 0.2 || e.type === 7 || e.type === 11 || e.type === 13) { 
                         geoms.push(new Geom(e.x + (Math.random()*20-10), e.y + (Math.random()*20-10)));
                     }
                 }
