@@ -545,6 +545,85 @@
         .hidden {
             display: none !important;
         }
+
+        #update-log {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: #ccc;
+            text-align: left;
+            max-width: 280px;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            z-index: 20;
+        }
+
+        #update-log h3 {
+            margin: 0 0 10px 0;
+            color: #00ffff;
+            font-size: 1.1rem;
+            text-shadow: 0 0 8px #00ffff;
+            text-align: center;
+            border-bottom: 1px dashed rgba(0, 255, 255, 0.4);
+            padding-bottom: 5px;
+        }
+
+        #update-log ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        #update-log li {
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .log-highlight {
+            color: #ff00ff;
+            font-weight: bold;
+        }
+
+        #close-update-log {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            color: #ff0044;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+        
+        #close-update-log:hover {
+            transform: scale(1.2);
+            text-shadow: 0 0 10px #ff0044;
+        }
+
+        .log-scroll-container {
+            max-height: 140px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .log-scroll-container::-webkit-scrollbar { width: 5px; }
+        .log-scroll-container::-webkit-scrollbar-track { background: rgba(0, 255, 255, 0.05); border-radius: 5px; }
+        .log-scroll-container::-webkit-scrollbar-thumb { background: rgba(0, 255, 255, 0.3); border-radius: 5px; }
+        .log-scroll-container::-webkit-scrollbar-thumb:hover { background: rgba(0, 255, 255, 0.6); }
+
+        @media (max-width: 900px) {
+            #update-log {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-top: 20px;
+                margin-bottom: 20px;
+                max-width: 90%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -583,6 +662,21 @@
     </div>
 
     <div id="overlay">
+        <div id="update-log">
+            <div id="close-update-log">&times;</div>
+            <h3>LATEST UPDATES</h3>
+            <div class="log-scroll-container">
+                <ul>
+                    <li><span class="log-highlight">New Mobs:</span> Zacharias Taranovich, Carter Richardson, Loot Bug, Dodger!</li>
+                    <li><span class="log-highlight">New Ship:</span> The Pizza Ship (50,000 PTS)</li>
+                    <li><span class="log-highlight">Feature:</span> Daily 50k PTS Reward Timer</li>
+                    <li><span class="log-highlight">Mechanic:</span> 25k+ Score Swarm Waves</li>
+                    <li><span class="log-highlight">System:</span> Pause Menu (ESC) & Cloud Saving</li>
+                    <li><span class="log-highlight">Admin:</span> 6 New Wild Cheats Added</li>
+                </ul>
+            </div>
+        </div>
+
         <div id="overlay-content">
             <h1 id="title-text">SPACE WARS</h1>
             <div id="subtitle">Defend the Neon Galaxy</div>
@@ -820,6 +914,14 @@
     const menuTotalPointsEl = document.getElementById('menu-total-points');
     const menuTipsEl = document.getElementById('menu-tips');
     const dailyRewardBtn = document.getElementById('daily-reward-btn');
+    const updateLog = document.getElementById('update-log');
+    const closeUpdateLogBtn = document.getElementById('close-update-log');
+
+    if (closeUpdateLogBtn && updateLog) {
+        closeUpdateLogBtn.addEventListener('click', () => {
+            updateLog.classList.add('hidden');
+        });
+    }
 
     // New Menu Elements
     const leaderboardBtn = document.getElementById('leaderboard-btn');
@@ -3217,8 +3319,8 @@
         constructor(x, y, type) {
             this.x = x;
             this.y = y;
-            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership, 8: Jumper, 9: Slither, 10: Splitter, 11: Titan, 12: Dodger, 13: Loot Bug, 14: Carter Richardson
-            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : 10;
+            this.type = type; // 0: Grunt, 1: Wanderer, 2: Weaver, 3: Brute, 4: Dart, 5: Pulsar, 6: Dasher, 7: Mothership, 8: Jumper, 9: Slither, 10: Splitter, 11: Titan, 12: Dodger, 13: Loot Bug, 14: Carter Richardson, 15: Zacharias Taranovich
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : type === 15 ? 16 : 10;
             this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
@@ -3311,6 +3413,12 @@
                 this.speed = 1.6 + Math.random() * 0.5 * difficulty; // Steady chaser
                 this.hp = 4; // Tougher than a grunt
                 this.scoreValue = 400;
+            } else if (type === 15) {
+                this.color = '#aa00ff'; // Purple Zacharias Taranovich
+                this.speed = 0.8 + Math.random() * 0.4 * difficulty; // Slow, but teleports
+                this.hp = 5;
+                this.scoreValue = 600;
+                this.blinkTimer = Math.random() * 120;
             }
         }
 
@@ -3562,6 +3670,37 @@
                     p.decay = 0.02; // Fade faster
                     particles.push(p);
                 }
+            } else if (this.type === 15) {
+                // Zacharias Taranovich logic: Slowly follows, but blinks/teleports closer periodically
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const distSq = dx*dx + dy*dy;
+                if (distSq > 0) {
+                    const dist = Math.sqrt(distSq);
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                }
+                this.angle += 0.05 * timeScale;
+                this.blinkTimer += timeScale;
+
+                if (this.blinkTimer > 150) {
+                    // Teleport!
+                    if (settingHighParticles) {
+                        let p = new Particle(this.x, this.y, this.color, 1.5);
+                        p.size = 5;
+                        particles.push(p);
+                    }
+                    const dist = Math.sqrt(distSq) || 1;
+                    const blinkDist = Math.min(150, dist - 40); // Don't telefrag directly on top of player
+                    this.x += (dx / dist) * blinkDist;
+                    this.y += (dy / dist) * blinkDist;
+                    if (settingHighParticles) {
+                        let p = new Particle(this.x, this.y, '#ffffff', 1.5);
+                        p.size = 5;
+                        particles.push(p);
+                    }
+                    this.blinkTimer = 0;
+                }
             }
 
             if (player && isRepellent) {
@@ -3707,6 +3846,14 @@
                 // White box
                 ctx.rect(-12, -12, 24, 24);
                 if (this.hp < 4) ctx.setLineDash([4, 4]);
+            } else if (this.type === 15) {
+                // Purple Octagon
+                for (let i = 0; i < 8; i++) {
+                    const a = (i * Math.PI) / 4;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                    else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                }
+                if (this.hp < 5) ctx.setLineDash([3, 3]);
             }
             
             if (this.type !== 7 && this.type !== 11) {
@@ -3724,6 +3871,13 @@
                     ctx.arc(d.x, d.y, 1.5, 0, Math.PI * 2);
                 }
                 ctx.fill();
+            } else if (this.type === 15) {
+                // Draw a "Z" inside for Zacharias
+                ctx.beginPath();
+                ctx.moveTo(-6, -6); ctx.lineTo(6, -6); ctx.lineTo(-6, 6); ctx.lineTo(6, 6);
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
             }
 
             ctx.restore();
@@ -3883,6 +4037,8 @@
             type = 10; // Teal Splitter
         } else if (difficulty > 1.8 && rand > 0.66) {
             type = 14; // Carter Richardson (White Box with Dots)
+        } else if (difficulty > 2.0 && rand > 0.64) {
+            type = 15; // Zacharias Taranovich (Purple Teleporter)
         } else if (difficulty > 1.8 && rand > 0.62) {
             type = 5; // Cyan Pulsar (Bouncing hazard)
         } else if (difficulty > 1.6 && rand > 0.54) {
@@ -4113,7 +4269,7 @@
                 // Drop Geom (Motherships drop 5, Titans drop 50)
                 const geomDrops = e.type === 11 ? 50 : e.type === 7 ? 5 : e.type === 13 ? 20 : 1;
                 for(let g = 0; g < geomDrops; g++) {
-                    if (Math.random() > 0.2 || e.type === 7 || e.type === 11 || e.type === 13) { 
+                    if (Math.random() > 0.2 || e.type === 7 || e.type === 11 || e.type === 13 || e.type === 15) { 
                         geoms.push(new Geom(e.x + (Math.random()*20-10), e.y + (Math.random()*20-10)));
                     }
                 }
