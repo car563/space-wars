@@ -703,6 +703,9 @@
             <h3>LATEST UPDATES</h3>
             <div class="log-scroll-container">
                 <ul>
+                    <li><span class="log-highlight">Feature:</span> Mystery Crate System is BACK!</li>
+                    <li><span class="log-highlight">Unlockables:</span> 20+ New Ships & Bullet Colors!</li>
+                    <li><span class="log-highlight">New Mobs:</span> Carson Ward & Carson Nolt added!</li>
                     <li><span class="log-highlight">New Mob:</span> Micah Pfeiffer added!</li>
                     <li><span class="log-highlight">New Mob:</span> MadMaxx (Heavy Charger) added!</li>
                     <li><span class="log-highlight">Settings:</span> Added Relative to Aim movement!</li>
@@ -743,8 +746,13 @@
 
             <div class="menu-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 600px;">
                 <button id="start-btn" style="width: 100%; border-color: #00ff00; color: #00ff00; box-shadow: 0 0 15px rgba(0,255,0,0.5);">START GAME</button>
+                <div style="display: flex; width: 100%; gap: 10px; margin: 0;">
+                    <button id="open-crate-btn" style="flex: 1; border-color: #ffaa00; color: #ffaa00; box-shadow: 0 0 15px rgba(255,170,0,0.5); margin: 0;">OPEN CRATE (150K)</button>
+                    <button id="view-crate-btn" style="flex: 1; border-color: #ffaa00; color: #ffaa00; box-shadow: 0 0 15px rgba(255,170,0,0.5); margin: 0;">VIEW REWARDS</button>
+                </div>
                 <button id="main-menu-btn" class="hidden" style="width: 100%;">MAIN MENU</button>
                 <button id="ship-select-btn">SHIP SELECT</button>
+                <button id="bullet-select-btn">BULLET COLORS</button>
                 <button id="leaderboard-btn">LEADERBOARD</button>
                 <button id="settings-btn">SETTINGS</button>
                 <button id="credits-btn">CREDITS</button>
@@ -757,6 +765,33 @@
 
             <div id="menu-tips">Tip: Collect Geoms to increase your score multiplier!</div>
         </div>
+    </div>
+
+    <!-- Crate Opening Modal -->
+    <div id="crate-modal" class="modal-overlay hidden" style="text-align: center;">
+        <h2 style="color: #ffaa00; text-shadow: 0 0 15px #ffaa00;">MYSTERY CRATE</h2>
+        <div id="crate-animation" style="font-size: 6rem; margin: 20px 0;">📦</div>
+        <div id="crate-reward" style="font-size: 1.5rem; color: #fff; height: 60px; line-height: 1.5; white-space: pre-line;"></div>
+        <button id="close-crate-btn" class="close-btn hidden" style="border-color: #ffaa00; color: #ffaa00;">AWESOME!</button>
+    </div>
+
+    <!-- Crate Preview Modal -->
+    <div id="crate-preview-modal" class="modal-overlay hidden">
+        <h2 style="color: #ffaa00; text-shadow: 0 0 15px #ffaa00;">CRATE REWARDS</h2>
+        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Preview the exclusive ships and bullet colors available in Mystery Crates!</p>
+        <div class="ship-options" id="crate-preview-container">
+            <!-- Dynamically injected -->
+        </div>
+        <button id="close-crate-preview-btn" class="close-btn" style="border-color: #ffaa00; color: #ffaa00;">CLOSE</button>
+    </div>
+
+    <!-- Bullet Colors Modal -->
+    <div id="bullet-select-modal" class="modal-overlay hidden">
+        <h2>SELECT BULLET COLOR</h2>
+        <div class="ship-options" id="bullet-options-container">
+            <!-- Dynamically injected -->
+        </div>
+        <button id="close-bullet-select-btn" class="close-btn">CLOSE</button>
     </div>
 
     <!-- Settings Modal -->
@@ -899,6 +934,8 @@
                 <button id="btn-carter-swarm">Spawn Carter Swarm</button>
                 <button id="btn-madmaxx-swarm">Spawn MadMaxx Swarm</button>
                 <button id="btn-micah-swarm">Spawn Micah Swarm</button>
+                <button id="btn-carson-ward-swarm">Spawn Carson Ward</button>
+                <button id="btn-carson-nolt-swarm">Spawn Carson Nolt</button>
                 <button id="btn-blackhole">Toggle Black Hole</button>
                 <button id="btn-disco">Toggle Disco Mode</button>
                 <button id="btn-maxdifficulty">Max Difficulty (+5.0)</button>
@@ -952,6 +989,19 @@
     const shipSelectBtn = document.getElementById('ship-select-btn');
     const shipSelectModal = document.getElementById('ship-select-modal');
     const closeShipSelectBtn = document.getElementById('close-ship-select-btn');
+
+    const bulletSelectBtn = document.getElementById('bullet-select-btn');
+    const bulletSelectModal = document.getElementById('bullet-select-modal');
+    const closeBulletSelectBtn = document.getElementById('close-bullet-select-btn');
+
+    const openCrateBtn = document.getElementById('open-crate-btn');
+    const viewCrateBtn = document.getElementById('view-crate-btn');
+    const crateModal = document.getElementById('crate-modal');
+    const cratePreviewModal = document.getElementById('crate-preview-modal');
+    const closeCrateBtn = document.getElementById('close-crate-btn');
+    const closeCratePreviewBtn = document.getElementById('close-crate-preview-btn');
+    const crateAnimation = document.getElementById('crate-animation');
+    const crateReward = document.getElementById('crate-reward');
 
     const settingsBtn = document.getElementById('settings-btn');
     const creditsBtn = document.getElementById('credits-btn');
@@ -1015,6 +1065,9 @@
     }
     let unlockedShips = unlockedShipsArray;
     let selectedShipType = parseInt(localStorage.getItem('spaceWarsShipType')) || 0;
+
+    let unlockedBulletColors = JSON.parse(localStorage.getItem('spaceWarsUnlockedBullets')) || ['#ffffff'];
+    let selectedBulletColor = localStorage.getItem('spaceWarsBulletColor') || '#ffffff';
 
     let state = 'MENU';
     let score = 0;
@@ -1503,11 +1556,20 @@
                     lastDailyReward = data.lastDailyReward;
                     localStorage.setItem('spaceWarsDailyReward', lastDailyReward);
                 }
+                if (data.unlockedBulletColors !== undefined) {
+                    unlockedBulletColors = data.unlockedBulletColors;
+                    localStorage.setItem('spaceWarsUnlockedBullets', JSON.stringify(unlockedBulletColors));
+                }
+                if (data.selectedBulletColor !== undefined) {
+                    selectedBulletColor = data.selectedBulletColor;
+                    localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
+                }
 
                 if (menuHighScoreEl) menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
                 if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
                 if (typeof updateDailyRewardUI === 'function') updateDailyRewardUI();
                 if (typeof renderShipSelect === 'function') renderShipSelect();
+                if (typeof renderBulletSelect === 'function') renderBulletSelect();
             }
         } catch (e) {
             console.error("Error loading cloud save data:", e);
@@ -1522,6 +1584,8 @@
                 totalPoints: totalPoints,
                 unlockedShips: unlockedShips,
                 selectedShipType: selectedShipType,
+                unlockedBulletColors: unlockedBulletColors,
+                selectedBulletColor: selectedBulletColor,
                 localHighScore: localHighScore,
                 lastDailyReward: lastDailyReward,
                 lastUpdated: Date.now()
@@ -2082,6 +2146,12 @@
     const btnMicahSwarm = document.getElementById('btn-micah-swarm');
     if (btnMicahSwarm) addHoldListener(btnMicahSwarm, () => { if (state === 'PLAYING') for (let i = 0; i < 5; i++) enemies.push(new Enemy(Math.random() < 0.5 ? -40 : width + 40, Math.random() * height, 17)); });
 
+    const btnCarsonWardSwarm = document.getElementById('btn-carson-ward-swarm');
+    if (btnCarsonWardSwarm) addHoldListener(btnCarsonWardSwarm, () => { if (state === 'PLAYING') for (let i = 0; i < 5; i++) enemies.push(new Enemy(Math.random() < 0.5 ? -40 : width + 40, Math.random() * height, 18)); });
+
+    const btnCarsonNoltSwarm = document.getElementById('btn-carson-nolt-swarm');
+    if (btnCarsonNoltSwarm) addHoldListener(btnCarsonNoltSwarm, () => { if (state === 'PLAYING') for (let i = 0; i < 5; i++) enemies.push(new Enemy(Math.random() < 0.5 ? -40 : width + 40, Math.random() * height, 19)); });
+
     const btnAlliedDrone = document.getElementById('btn-allied-drone');
     if (btnAlliedDrone) btnAlliedDrone.addEventListener('click', () => { isAlliedDrone = !isAlliedDrone; toggleAdminBtn(btnAlliedDrone, isAlliedDrone); });
 
@@ -2175,7 +2245,42 @@
         { id: 1, name: "Fighter", price: 50000 },
         { id: 2, name: "Stealth", price: 250000 },
         { id: 3, name: "Saucer", price: 1000000 },
-        { id: 4, name: "Pizza", price: 50000 }
+        { id: 4, name: "Pizza", price: 50000 },
+        // Crate Exclusive Ships (-1 price = Crate Only)
+        { id: 5, name: "Star Cruiser", price: -1 },
+        { id: 6, name: "Interceptor", price: -1 },
+        { id: 7, name: "Juggernaut", price: -1 },
+        { id: 8, name: "Stingray", price: -1 },
+        { id: 9, name: "Scythe", price: -1 },
+        { id: 10, name: "X-Fighter", price: -1 },
+        { id: 11, name: "Escape Pod", price: -1 },
+        { id: 12, name: "Diamondback", price: -1 },
+        { id: 13, name: "Trident", price: -1 },
+        { id: 14, name: "Hammerhead", price: -1 },
+        { id: 15, name: "Crescent", price: -1 },
+        { id: 16, name: "Needle", price: -1 },
+        { id: 17, name: "Dragonfly", price: -1 },
+        { id: 18, name: "Nightwing", price: -1 },
+        { id: 19, name: "Aegis", price: -1 },
+        { id: 20, name: "Orbiter", price: -1 },
+        { id: 21, name: "Templar", price: -1 },
+        { id: 22, name: "Arrow", price: -1 },
+        { id: 23, name: "Gemini", price: -1 },
+        { id: 24, name: "Monarch", price: -1 }
+    ];
+
+    const bulletData = [
+        { id: '#ffffff', name: "Classic White" },
+        { id: '#00ffff', name: "Cyan Plasma" },
+        { id: '#ff00ff', name: "Neon Magenta" },
+        { id: '#00ff00', name: "Toxic Green" },
+        { id: '#ffff00', name: "Sun Flare" },
+        { id: '#ff0000', name: "Crimson Laser" },
+        { id: '#ff8800', name: "Magma Orange" },
+        { id: '#aa00ff', name: "Void Purple" },
+        { id: '#ffb6c1', name: "Sakura Pink" },
+        { id: '#32cd32', name: "Slime Sludge" },
+        { id: '#ffd700', name: "Golden Ray" }
     ];
 
     function drawShipGeometry(ctx, type, color) {
@@ -2224,6 +2329,42 @@
             ctx.beginPath(); ctx.arc(4, 0, 3, 0, Math.PI*2); ctx.fillStyle = '#ff3333'; ctx.fill();
             ctx.beginPath(); ctx.arc(-5, -6, 2.5, 0, Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.arc(-4, 6, 2.5, 0, Math.PI*2); ctx.fill();
+        } else {
+            // Use dynamically plotted paths for new crate ships
+            const shipPaths = [
+                [], [], [], [], [], // 0-4 are custom above
+                [[20,0], [5,5], [0,20], [-5,5], [-20,0], [-5,-5], [0,-20], [5,-5]], // 5
+                [[22,0], [-8,12], [-14,12], [-8,0], [-14,-12], [-8,-12]], // 6
+                [[15,10], [5,15], [-15,15], [-10,0], [-15,-15], [5,-15], [15,-10]], // 7
+                [[16,0], [0,18], [-14,10], [-8,0], [-14,-10], [0,-18]], // 8
+                [[18,0], [-2,18], [-16,18], [-6,0], [-16,-18], [-2,-18]], // 9
+                [[16,4], [16,8], [-12,18], [-6,0], [-12,-18], [16,-8], [16,-4], [2,0]], // 10
+                [[14,0], [8,10], [-8,10], [-14,6], [-14,-6], [-8,-10], [8,-10]], // 11
+                [[20,0], [0,12], [-16,0], [0,-12]], // 12
+                [[18,0], [6,6], [12,16], [-12,16], [-6,0], [-12,-16], [12,-16], [6,-6]], // 13
+                [[8,16], [16,16], [16,-16], [8,-16], [0,-6], [-16,-6], [-16,6], [0,6]], // 14
+                [[16,0], [0,16], [-16,20], [-8,0], [-16,-20], [0,-16]], // 15
+                [[24,0], [-14,5], [-10,0], [-14,-5]], // 16
+                [[12,0], [4,4], [-6,22], [-12,22], [-2,4], [-12,0], [-2,-4], [-6,-22], [-12,-22], [4,-4]], // 17
+                [[14,0], [-16,20], [-8,0], [-16,-20]], // 18
+                [[14,0], [0,14], [-14,10], [-14,-10], [0,-14]], // 19
+                [[12,0], [6,10], [-6,10], [-12,0], [-6,-10], [6,-10]], // 20
+                [[16,4], [4,4], [4,16], [-4,16], [-4,4], [-16,4], [-16,-4], [-4,-4], [-4,-16], [4,-16], [4,-4], [16,-4]], // 21
+                [[18,0], [-14,16], [-6,0], [-14,-16]], // 22
+                [[16,12], [-12,12], [-12,4], [0,4], [0,-4], [-12,-4], [-12,-12], [16,-12], [16,-4], [6,-4], [6,4], [16,4]], // 23
+                [[16,0], [6,8], [-14,16], [-6,0], [-14,-16], [6,-8]] // 24
+            ];
+            const path = shipPaths[type] || shipPaths[5]; 
+            ctx.moveTo(path[0][0], path[0][1]);
+            for (let i = 1; i < path.length; i++) {
+                ctx.lineTo(path[i][0], path[i][1]);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
+            if (type === 20) {
+                ctx.beginPath(); ctx.arc(18, 0, 2, 0, Math.PI*2); ctx.fillStyle = color; ctx.fill();
+                ctx.beginPath(); ctx.arc(-18, 0, 2, 0, Math.PI*2); ctx.fillStyle = color; ctx.fill();
+            }
         }
 
         ctx.beginPath();
@@ -2313,7 +2454,80 @@
         initShipPreviews();
     }
 
+    function initBulletPreviews() {
+        document.querySelectorAll('.bullet-preview').forEach(canvas => {
+            const ctx = canvas.getContext('2d');
+            const color = canvas.dataset.color;
+            ctx.clearRect(0, 0, 60, 60);
+            
+            ctx.beginPath();
+            ctx.globalCompositeOperation = 'lighter';
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 15;
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            
+            ctx.arc(35, 30, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(35, 30);
+            ctx.lineTo(15, 30);
+            ctx.lineWidth = 4;
+            ctx.stroke();
+        });
+    }
+
+    function renderBulletSelect() {
+        const container = document.getElementById('bullet-options-container');
+        if (!container) return;
+        container.innerHTML = ''; 
+
+        bulletData.forEach(bullet => {
+            const btn = document.createElement('button');
+            btn.className = 'ship-btn';
+            
+            let statusText = '';
+            let isOwned = unlockedBulletColors.includes(bullet.id);
+            
+            if (isOwned) {
+                if (bullet.id === selectedBulletColor) {
+                    btn.classList.add('active');
+                    statusText = 'EQUIPPED';
+                } else {
+                    statusText = 'OWNED';
+                }
+            } else {
+                btn.classList.add('locked');
+                statusText = 'CRATE EXCLUSIVE';
+            }
+
+            btn.innerHTML = `
+                <canvas class="bullet-preview" width="60" height="60" data-color="${bullet.id}"></canvas>
+                <div class="ship-name">${isOwned ? bullet.name : '???'}</div>
+                <div class="ship-status">${statusText}</div>
+            `;
+            
+            btn.addEventListener('click', () => {
+                if (isOwned) {
+                    selectedBulletColor = bullet.id;
+                    localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
+                    saveGameData(); 
+                    renderBulletSelect();
+                } else {
+                    btn.style.backgroundColor = "rgba(255, 0, 0, 0.4)";
+                    setTimeout(() => btn.style.backgroundColor = "", 200);
+                }
+            });
+            
+            container.appendChild(btn);
+        });
+
+        initBulletPreviews();
+    }
+
     renderShipSelect();
+    renderBulletSelect();
 
     if (shipSelectBtn) {
         shipSelectBtn.addEventListener('click', () => {
@@ -2324,6 +2538,150 @@
     if (closeShipSelectBtn) closeShipSelectBtn.addEventListener('click', () => {
         if (shipSelectModal) shipSelectModal.classList.add('hidden');
     });
+
+    function renderCratePreview() {
+        const container = document.getElementById('crate-preview-container');
+        if (!container) return;
+        container.innerHTML = ''; 
+
+        const crateShips = shipData.filter(s => s.price === -1);
+        crateShips.forEach(ship => {
+            const btn = document.createElement('div');
+            btn.className = 'ship-btn';
+            btn.style.cursor = 'default';
+            
+            let isOwned = unlockedShips.includes(ship.id);
+            if (isOwned) btn.classList.add('active');
+            else btn.classList.add('locked');
+
+            btn.innerHTML = `
+                <canvas class="ship-preview" width="60" height="60" data-ship="${ship.id}"></canvas>
+                <div class="ship-name">${ship.name}</div>
+                <div class="ship-status">${isOwned ? 'OWNED' : 'LOCKED'}</div>
+            `;
+            container.appendChild(btn);
+        });
+
+        bulletData.forEach(bullet => {
+            if (bullet.id === '#ffffff') return; // Default white isn't a crate drop
+            const btn = document.createElement('div');
+            btn.className = 'ship-btn';
+            btn.style.cursor = 'default';
+            
+            let isOwned = unlockedBulletColors.includes(bullet.id);
+            if (isOwned) btn.classList.add('active');
+            else btn.classList.add('locked');
+
+            btn.innerHTML = `
+                <canvas class="bullet-preview" width="60" height="60" data-color="${bullet.id}"></canvas>
+                <div class="ship-name">${bullet.name}</div>
+                <div class="ship-status">${isOwned ? 'OWNED' : 'LOCKED'}</div>
+            `;
+            container.appendChild(btn);
+        });
+
+        initShipPreviews();
+        initBulletPreviews();
+    }
+
+    if (viewCrateBtn) {
+        viewCrateBtn.addEventListener('click', () => {
+            renderCratePreview();
+            if (cratePreviewModal) cratePreviewModal.classList.remove('hidden');
+        });
+    }
+    
+    if (closeCratePreviewBtn) {
+        closeCratePreviewBtn.addEventListener('click', () => {
+            if (cratePreviewModal) cratePreviewModal.classList.add('hidden');
+        });
+    }
+
+    if (bulletSelectBtn) {
+        bulletSelectBtn.addEventListener('click', () => {
+            renderBulletSelect();
+            if (bulletSelectModal) bulletSelectModal.classList.remove('hidden');
+        });
+    }
+    if (closeBulletSelectBtn) closeBulletSelectBtn.addEventListener('click', () => {
+        if (bulletSelectModal) bulletSelectModal.classList.add('hidden');
+    });
+
+    // --- CRATE OPENING SYSTEM ---
+    if (openCrateBtn) {
+        openCrateBtn.addEventListener('click', () => {
+            if (totalPoints >= 150000) {
+                totalPoints -= 150000;
+                localStorage.setItem('spaceWarsTotalPoints', totalPoints);
+                if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+                
+                if (crateModal) crateModal.classList.remove('hidden');
+                if (closeCrateBtn) closeCrateBtn.classList.add('hidden');
+                if (crateAnimation) crateAnimation.style.animation = "shake 0.15s infinite";
+                if (crateReward) {
+                    crateReward.style.color = '#fff';
+                    crateReward.innerText = "OPENING CRATE...";
+                }
+
+                if (typeof initAudio === 'function') initAudio();
+                if (typeof playSound === 'function') playSound('type');
+
+                let availableShips = shipData.filter(s => s.price === -1 && !unlockedShips.includes(s.id));
+                let availableBullets = bulletData.filter(b => !unlockedBulletColors.includes(b.id));
+
+                let pool = [];
+                availableShips.forEach(s => pool.push({ type: 'ship', item: s }));
+                availableBullets.forEach(b => pool.push({ type: 'bullet', item: b }));
+
+                setTimeout(() => {
+                    if (crateAnimation) crateAnimation.style.animation = "none";
+                    if (typeof playSound === 'function') playSound('titan'); 
+
+                    if (pool.length === 0) {
+                        if (crateReward) {
+                            crateReward.style.color = '#ff0000';
+                            crateReward.innerText = "ALL ITEMS UNLOCKED!\nREFUNDED 150,000 PTS";
+                        }
+                        totalPoints += 150000;
+                        localStorage.setItem('spaceWarsTotalPoints', totalPoints);
+                        if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+                    } else {
+                        let reward = pool[Math.floor(Math.random() * pool.length)];
+                        if (crateReward) crateReward.style.color = '#00ffff';
+                        
+                        if (reward.type === 'ship') {
+                            if (crateReward) crateReward.innerText = `NEW SHIP UNLOCKED:\n${reward.item.name}`;
+                            unlockedShips.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedShips', JSON.stringify(unlockedShips));
+                            selectedShipType = reward.item.id; 
+                            localStorage.setItem('spaceWarsShipType', selectedShipType);
+                        } else {
+                            if (crateReward) crateReward.innerText = `NEW BULLET COLOR UNLOCKED:\n${reward.item.name}`;
+                            unlockedBulletColors.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedBullets', JSON.stringify(unlockedBulletColors));
+                            selectedBulletColor = reward.item.id; 
+                            localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
+                        }
+                    }
+
+                    saveGameData(); 
+                    renderShipSelect(); 
+                    renderBulletSelect();
+                    
+                    if (closeCrateBtn) closeCrateBtn.classList.remove('hidden');
+                }, 1800);
+            } else {
+                openCrateBtn.style.backgroundColor = "rgba(255, 0, 0, 0.4)";
+                setTimeout(() => openCrateBtn.style.backgroundColor = "", 200);
+            }
+        });
+    }
+
+    if (closeCrateBtn) {
+        closeCrateBtn.addEventListener('click', () => {
+            if (crateModal) crateModal.classList.add('hidden');
+        });
+    }
 
     // --- CLASSES ---
     class Player {
@@ -2693,7 +3051,7 @@
             this.vx = dx * speed;
             this.vy = dy * speed;
             this.radius = isGiantBullets ? 15 : 2;
-            this.color = isGiantBullets ? '#ffff00' : '#fff';
+            this.color = isGiantBullets ? '#ffff00' : selectedBulletColor;
             this.life = 100;
             this.isFlame = false;
             this.isMine = false;
@@ -2789,7 +3147,7 @@
             this.x = x;
             this.y = y;
             this.type = type; 
-            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : type === 15 ? 16 : type === 16 ? 22 : type === 17 ? 16 : 10;
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : type === 15 ? 16 : type === 16 ? 22 : type === 17 ? 16 : type === 18 ? 16 : type === 19 ? 18 : 10;
             this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
@@ -2900,6 +3258,18 @@
                 this.hp = 3;
                 this.scoreValue = 700;
                 this.zigzagTimer = Math.random() * Math.PI * 2;
+            } else if (type === 18) {
+                this.color = '#ff00ff'; // Neon Magenta
+                this.speed = 1.4 + Math.random() * 0.5 * difficulty; 
+                this.hp = 4;
+                this.scoreValue = 900;
+                this.teleportTimer = Math.random() * 100;
+            } else if (type === 19) {
+                this.color = '#00ffcc'; // Teal
+                this.speed = 4.0 + Math.random() * difficulty; // Very fast
+                this.hp = 2;
+                this.scoreValue = 850;
+                this.sweepAngle = Math.random() * Math.PI * 2;
             }
         }
 
@@ -3249,6 +3619,54 @@
                     this.vy = (dirY * this.speed) + (perpY * zigzag);
                 }
                 this.angle = Math.atan2(this.vy, this.vx);
+            } else if (this.type === 18) {
+                // Carson Ward: Follows, but teleports directly behind the player occasionally
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const distSq = dx*dx + dy*dy;
+                if (distSq > 0) {
+                    const dist = Math.sqrt(distSq);
+                    this.vx = (dx / dist) * this.speed;
+                    this.vy = (dy / dist) * this.speed;
+                }
+                this.angle += 0.05 * timeScale;
+                this.teleportTimer += timeScale;
+
+                if (this.teleportTimer > 180 && player) {
+                    if (settingHighParticles) {
+                        let p = new Particle(this.x, this.y, this.color, 1.5);
+                        p.size = 6;
+                        particles.push(p);
+                    }
+                    // Teleport exactly behind where the player is currently aiming/facing
+                    const tpDist = 150;
+                    this.x = player.x - Math.cos(player.angle) * tpDist;
+                    this.y = player.y - Math.sin(player.angle) * tpDist;
+                    if (settingHighParticles) {
+                        let p = new Particle(this.x, this.y, '#ffffff', 1.5);
+                        p.size = 6;
+                        particles.push(p);
+                    }
+                    this.teleportTimer = 0;
+                }
+            } else if (this.type === 19) {
+                // Carson Nolt: Swooping serpent pattern
+                this.sweepAngle += 0.08 * timeScale;
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const targetAngle = Math.atan2(dy, dx);
+                
+                // Move mostly towards player, but with a strong sine wave perpendicular sway
+                const forwardX = Math.cos(targetAngle) * (this.speed * 0.6);
+                const forwardY = Math.sin(targetAngle) * (this.speed * 0.6);
+                
+                const sway = Math.sin(this.sweepAngle) * (this.speed * 1.5);
+                const swayX = Math.cos(targetAngle + Math.PI/2) * sway;
+                const swayY = Math.sin(targetAngle + Math.PI/2) * sway;
+                
+                this.vx = forwardX + swayX;
+                this.vy = forwardY + swayY;
+                this.angle += 0.2 * timeScale; // Spin wildly
             }
 
             if (player && isRepellent) {
@@ -3408,6 +3826,30 @@
                 ctx.moveTo(14, 14); ctx.lineTo(-14, -14); 
                 ctx.lineTo(-14, 14); ctx.lineTo(14, -14);
                 if (this.hp < 2) ctx.setLineDash([3, 3]);
+            } else if (this.type === 18) {
+                for (let i = 0; i < 6; i++) {
+                    const a = (i * Math.PI) / 3;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                    else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                }
+                ctx.closePath();
+                ctx.moveTo(-this.radius, 0); ctx.lineTo(this.radius, 0);
+                ctx.moveTo(0, -this.radius); ctx.lineTo(0, this.radius);
+                if (this.hp < 4) ctx.setLineDash([3, 3]);
+            } else if (this.type === 19) {
+                for (let i = 0; i < 3; i++) {
+                    const a = (i * Math.PI * 2) / 3;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                    else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                }
+                ctx.closePath(); ctx.stroke();
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    const a = ((i * Math.PI * 2) / 3) + Math.PI;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                    else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                }
+                if (this.hp < 2) ctx.setLineDash([2, 2]);
             }
             
             if (this.type !== 7 && this.type !== 11) {
@@ -3587,7 +4029,9 @@
         else if (difficulty > 2.8 && rand > 0.93) type = 8; 
         else if (difficulty > 1.5 && rand > 0.90) type = 13; 
         else if (difficulty > 2.5 && rand > 0.86) type = 6; 
+        else if (difficulty > 2.7 && rand > 0.84) type = 19; 
         else if (difficulty > 2.6 && rand > 0.82) type = 16; 
+        else if (difficulty > 2.5 && rand > 0.81) type = 18; 
         else if (difficulty > 2.4 && rand > 0.80) type = 17; 
         else if (difficulty > 2.2 && rand > 0.78) type = 3; 
         else if (difficulty > 1.9 && rand > 0.70) type = 10; 
@@ -4014,13 +4458,15 @@
             const leaderboardIsHidden = leaderboardModal && leaderboardModal.classList.contains('hidden');
             const creditsIsHidden = creditsModal && creditsModal.classList.contains('hidden');
             const shipSelectIsHidden = shipSelectModal && shipSelectModal.classList.contains('hidden');
+            const cratePreviewIsHidden = cratePreviewModal && cratePreviewModal.classList.contains('hidden');
 
             if ((state === 'MENU' || state === 'GAMEOVER') && 
                 authIsHidden && 
                 settingsIsHidden && 
                 leaderboardIsHidden && 
                 creditsIsHidden &&
-                shipSelectIsHidden) {
+                shipSelectIsHidden &&
+                cratePreviewIsHidden) {
                 if (startBtn) startBtn.click();
             }
         }
