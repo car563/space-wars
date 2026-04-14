@@ -703,6 +703,7 @@
             <h3>LATEST UPDATES</h3>
             <div class="log-scroll-container">
                 <ul>
+                    <li><span class="log-highlight">Feature:</span> Crates now give 50% refund on duplicates!</li>
                     <li><span class="log-highlight">Feature:</span> Mystery Crate System is BACK!</li>
                     <li><span class="log-highlight">Unlockables:</span> 20+ New Ships & Bullet Colors!</li>
                     <li><span class="log-highlight">New Mobs:</span> Carson Ward & Carson Nolt added!</li>
@@ -810,6 +811,7 @@
     <!-- Credits Modal -->
     <div id="credits-modal" class="modal-overlay hidden">
         <h2>CREDITS</h2>
+        <p style="color: #fff;"><strong>Creator:</strong> Carson Ward</p>
         <p style="color: #fff;"><strong>Design & Code:</strong> AI Assistant</p>
         <p style="color: #fff;"><strong>Inspiration:</strong> Geometry Wars</p>
         <p style="color: #fff;"><strong>Font:</strong> Orbitron (Google Fonts)</p>
@@ -2626,27 +2628,32 @@
                 if (typeof initAudio === 'function') initAudio();
                 if (typeof playSound === 'function') playSound('type');
 
-                let availableShips = shipData.filter(s => s.price === -1 && !unlockedShips.includes(s.id));
-                let availableBullets = bulletData.filter(b => !unlockedBulletColors.includes(b.id));
-
                 let pool = [];
-                availableShips.forEach(s => pool.push({ type: 'ship', item: s }));
-                availableBullets.forEach(b => pool.push({ type: 'bullet', item: b }));
+                shipData.filter(s => s.price === -1).forEach(s => pool.push({ type: 'ship', item: s }));
+                bulletData.filter(b => b.id !== '#ffffff').forEach(b => pool.push({ type: 'bullet', item: b }));
 
                 setTimeout(() => {
                     if (crateAnimation) crateAnimation.style.animation = "none";
                     if (typeof playSound === 'function') playSound('titan'); 
 
-                    if (pool.length === 0) {
+                    let reward = pool[Math.floor(Math.random() * pool.length)];
+                    let isDuplicate = false;
+
+                    if (reward.type === 'ship') {
+                        isDuplicate = unlockedShips.includes(reward.item.id);
+                    } else {
+                        isDuplicate = unlockedBulletColors.includes(reward.item.id);
+                    }
+
+                    if (isDuplicate) {
                         if (crateReward) {
-                            crateReward.style.color = '#ff0000';
-                            crateReward.innerText = "ALL ITEMS UNLOCKED!\nREFUNDED 150,000 PTS";
+                            crateReward.style.color = '#ffcc00';
+                            crateReward.innerText = `DUPLICATE REWARD:\n${reward.item.name}\nREFUNDED 75,000 PTS!`;
                         }
-                        totalPoints += 150000;
+                        totalPoints += 75000;
                         localStorage.setItem('spaceWarsTotalPoints', totalPoints);
                         if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
                     } else {
-                        let reward = pool[Math.floor(Math.random() * pool.length)];
                         if (crateReward) crateReward.style.color = '#00ffff';
                         
                         if (reward.type === 'ship') {
