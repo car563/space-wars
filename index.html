@@ -703,6 +703,8 @@
             <h3>LATEST UPDATES</h3>
             <div class="log-scroll-container">
                 <ul>
+                    <li><span class="log-highlight">New Mob:</span> The Sentinel (Tactical Shield) added!</li>
+                    <li><span class="log-highlight">Unlockables:</span> Added Kill & Death Effects to Crates!</li>
                     <li><span class="log-highlight">Feature:</span> Added Crate Slot Machine Animation!</li>
                     <li><span class="log-highlight">System:</span> Added Offline Mode Leaderboard!</li>
                     <li><span class="log-highlight">Feature:</span> Crates now give 50% refund on duplicates!</li>
@@ -716,9 +718,7 @@
                     <li><span class="log-highlight">Audio:</span> New SFX for Admin Cheat Codes!</li>
                     <li><span class="log-highlight">New Ship:</span> The Pizza Ship (50,000 PTS)</li>
                     <li><span class="log-highlight">Feature:</span> Daily 50k PTS Reward Timer</li>
-                    <li><span class="log-highlight">Mechanic:</span> 60k+ Score Swarm Waves</li>
                     <li><span class="log-highlight">System:</span> Pause Menu (ESC) & Cloud Saving</li>
-                    <li><span class="log-highlight">Admin:</span> 6 New Wild Cheats Added</li>
                 </ul>
             </div>
         </div>
@@ -747,18 +747,23 @@
                 </div>
             </div>
 
-            <div class="menu-buttons" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; max-width: 600px;">
+            <div class="menu-buttons" style="display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 600px; width: 100%;">
                 <button id="start-btn" style="width: 100%; border-color: #00ff00; color: #00ff00; box-shadow: 0 0 15px rgba(0,255,0,0.5);">START GAME</button>
                 <div style="display: flex; width: 100%; gap: 10px; margin: 0;">
                     <button id="open-crate-btn" style="flex: 1; border-color: #ffaa00; color: #ffaa00; box-shadow: 0 0 15px rgba(255,170,0,0.5); margin: 0;">OPEN CRATE (150K)</button>
                     <button id="view-crate-btn" style="flex: 1; border-color: #ffaa00; color: #ffaa00; box-shadow: 0 0 15px rgba(255,170,0,0.5); margin: 0;">VIEW REWARDS</button>
                 </div>
                 <button id="main-menu-btn" class="hidden" style="width: 100%;">MAIN MENU</button>
-                <button id="ship-select-btn">SHIP SELECT</button>
-                <button id="bullet-select-btn">BULLET COLORS</button>
-                <button id="leaderboard-btn">LEADERBOARD</button>
-                <button id="settings-btn">SETTINGS</button>
-                <button id="credits-btn">CREDITS</button>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;">
+                    <button id="ship-select-btn" style="margin: 0; width: 100%;">SHIP SELECT</button>
+                    <button id="bullet-select-btn" style="margin: 0; width: 100%;">BULLET COLORS</button>
+                    <button id="kill-select-btn" style="margin: 0; width: 100%;">KILL EFFECTS</button>
+                    <button id="death-select-btn" style="margin: 0; width: 100%;">DEATH EFFECTS</button>
+                    <button id="leaderboard-btn" style="margin: 0; width: 100%;">LEADERBOARD</button>
+                    <button id="settings-btn" style="margin: 0; width: 100%;">SETTINGS</button>
+                </div>
+                <button id="credits-btn" style="width: 100%;">CREDITS</button>
             </div>
             
             <div id="cheat-section" style="margin-top: 40px; display: flex; align-items: center;">
@@ -781,20 +786,30 @@
     <!-- Crate Preview Modal -->
     <div id="crate-preview-modal" class="modal-overlay hidden">
         <h2 style="color: #ffaa00; text-shadow: 0 0 15px #ffaa00;">CRATE REWARDS</h2>
-        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Preview the exclusive ships and bullet colors available in Mystery Crates!</p>
+        <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">Preview the exclusive items available in Mystery Crates!</p>
         <div class="ship-options" id="crate-preview-container">
             <!-- Dynamically injected -->
         </div>
         <button id="close-crate-preview-btn" class="close-btn" style="border-color: #ffaa00; color: #ffaa00;">CLOSE</button>
     </div>
 
-    <!-- Bullet Colors Modal -->
+    <!-- Modals for Selections -->
     <div id="bullet-select-modal" class="modal-overlay hidden">
         <h2>SELECT BULLET COLOR</h2>
-        <div class="ship-options" id="bullet-options-container">
-            <!-- Dynamically injected -->
-        </div>
+        <div class="ship-options" id="bullet-options-container"></div>
         <button id="close-bullet-select-btn" class="close-btn">CLOSE</button>
+    </div>
+
+    <div id="kill-select-modal" class="modal-overlay hidden">
+        <h2>SELECT KILL EFFECT</h2>
+        <div class="ship-options" id="kill-options-container"></div>
+        <button id="close-kill-select-btn" class="close-btn">CLOSE</button>
+    </div>
+
+    <div id="death-select-modal" class="modal-overlay hidden">
+        <h2>SELECT DEATH EFFECT</h2>
+        <div class="ship-options" id="death-options-container"></div>
+        <button id="close-death-select-btn" class="close-btn">CLOSE</button>
     </div>
 
     <!-- Settings Modal -->
@@ -940,6 +955,7 @@
                 <button id="btn-micah-swarm">Spawn Micah Swarm</button>
                 <button id="btn-carson-ward-swarm">Spawn Carson Ward</button>
                 <button id="btn-carson-nolt-swarm">Spawn Carson Nolt</button>
+                <button id="btn-sentinel-swarm">Spawn Sentinel</button>
                 <button id="btn-blackhole">Toggle Black Hole</button>
                 <button id="btn-disco">Toggle Disco Mode</button>
                 <button id="btn-maxdifficulty">Max Difficulty (+5.0)</button>
@@ -997,6 +1013,14 @@
     const bulletSelectBtn = document.getElementById('bullet-select-btn');
     const bulletSelectModal = document.getElementById('bullet-select-modal');
     const closeBulletSelectBtn = document.getElementById('close-bullet-select-btn');
+
+    const killSelectBtn = document.getElementById('kill-select-btn');
+    const killSelectModal = document.getElementById('kill-select-modal');
+    const closeKillSelectBtn = document.getElementById('close-kill-select-btn');
+
+    const deathSelectBtn = document.getElementById('death-select-btn');
+    const deathSelectModal = document.getElementById('death-select-modal');
+    const closeDeathSelectBtn = document.getElementById('close-death-select-btn');
 
     const openCrateBtn = document.getElementById('open-crate-btn');
     const viewCrateBtn = document.getElementById('view-crate-btn');
@@ -1064,14 +1088,18 @@
     let lastDailyReward = parseInt(localStorage.getItem('spaceWarsDailyReward')) || 0;
 
     let unlockedShipsArray = JSON.parse(localStorage.getItem('spaceWarsUnlockedShips'));
-    if (!Array.isArray(unlockedShipsArray)) {
-        unlockedShipsArray = [0]; // ONLY default to ship 0 (The Claw) to fix unlock bug
-    }
+    if (!Array.isArray(unlockedShipsArray)) { unlockedShipsArray = [0]; }
     let unlockedShips = unlockedShipsArray;
     let selectedShipType = parseInt(localStorage.getItem('spaceWarsShipType')) || 0;
 
     let unlockedBulletColors = JSON.parse(localStorage.getItem('spaceWarsUnlockedBullets')) || ['#ffffff'];
     let selectedBulletColor = localStorage.getItem('spaceWarsBulletColor') || '#ffffff';
+
+    let unlockedKillEffects = JSON.parse(localStorage.getItem('spaceWarsUnlockedKillEffects')) || ['default'];
+    let selectedKillEffect = localStorage.getItem('spaceWarsKillEffect') || 'default';
+
+    let unlockedDeathEffects = JSON.parse(localStorage.getItem('spaceWarsUnlockedDeathEffects')) || ['default'];
+    let selectedDeathEffect = localStorage.getItem('spaceWarsDeathEffect') || 'default';
 
     let state = 'MENU';
     let score = 0;
@@ -1153,6 +1181,7 @@
     let enemies = [];
     let particles = [];
     let geoms = [];
+    let rings = [];
 
     // --- CANVAS & SYSTEM ---
     let width = window.innerWidth;
@@ -1214,10 +1243,10 @@
     window.addEventListener('mousedown', (e) => {
         if(e.button === 0) mouse.down = true; 
         if(e.button === 2 && isClickTeleport && player && state === 'PLAYING') {
-            createExplosion(player.x, player.y, player.color, 15);
+            createKillEffect(player.x, player.y, player.color, 15);
             player.x = mouse.x;
             player.y = mouse.y;
-            createExplosion(player.x, player.y, '#ffffff', 15);
+            createKillEffect(player.x, player.y, '#ffffff', 15);
         }
     });
 
@@ -1589,12 +1618,30 @@
                     selectedBulletColor = data.selectedBulletColor;
                     localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
                 }
+                if (data.unlockedKillEffects !== undefined) {
+                    unlockedKillEffects = data.unlockedKillEffects;
+                    localStorage.setItem('spaceWarsUnlockedKillEffects', JSON.stringify(unlockedKillEffects));
+                }
+                if (data.selectedKillEffect !== undefined) {
+                    selectedKillEffect = data.selectedKillEffect;
+                    localStorage.setItem('spaceWarsKillEffect', selectedKillEffect);
+                }
+                if (data.unlockedDeathEffects !== undefined) {
+                    unlockedDeathEffects = data.unlockedDeathEffects;
+                    localStorage.setItem('spaceWarsUnlockedDeathEffects', JSON.stringify(unlockedDeathEffects));
+                }
+                if (data.selectedDeathEffect !== undefined) {
+                    selectedDeathEffect = data.selectedDeathEffect;
+                    localStorage.setItem('spaceWarsDeathEffect', selectedDeathEffect);
+                }
 
                 if (menuHighScoreEl) menuHighScoreEl.innerText = `Personal Best: ${parseInt(localHighScore).toLocaleString()}`;
                 if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
                 if (typeof updateDailyRewardUI === 'function') updateDailyRewardUI();
                 if (typeof renderShipSelect === 'function') renderShipSelect();
                 if (typeof renderBulletSelect === 'function') renderBulletSelect();
+                if (typeof renderKillSelect === 'function') renderKillSelect();
+                if (typeof renderDeathSelect === 'function') renderDeathSelect();
             }
         } catch (e) {
             console.error("Error loading cloud save data:", e);
@@ -1611,6 +1658,10 @@
                 selectedShipType: selectedShipType,
                 unlockedBulletColors: unlockedBulletColors,
                 selectedBulletColor: selectedBulletColor,
+                unlockedKillEffects: unlockedKillEffects,
+                selectedKillEffect: selectedKillEffect,
+                unlockedDeathEffects: unlockedDeathEffects,
+                selectedDeathEffect: selectedDeathEffect,
                 localHighScore: localHighScore,
                 lastDailyReward: lastDailyReward,
                 lastUpdated: Date.now()
@@ -2094,7 +2145,7 @@
         geoms.forEach(g => {
             if (!g.collected && g.life > 0) {
                 g.collected = true; geomCount++;
-                if (geomCount >= multiplier * 10) { multiplier++; geomCount = 0; createExplosion(player.x, player.y, '#ff00ff', 20); }
+                if (geomCount >= multiplier * 10) { multiplier++; geomCount = 0; createHitSpark(player.x, player.y, '#ff00ff', 20); }
             }
         });
         geoms = []; updateUI();
@@ -2103,7 +2154,7 @@
     const btnNuke = document.getElementById('btn-nuke');
     addHoldListener(btnNuke, () => {
         if (state !== 'PLAYING') return;
-        enemies.forEach(e => { createExplosion(e.x, e.y, e.color, 15); score += e.scoreValue * multiplier; if (Math.random() > 0.2) geoms.push(new Geom(e.x, e.y)); });
+        enemies.forEach(e => { createKillEffect(e.x, e.y, e.color, 15); score += e.scoreValue * multiplier; if (Math.random() > 0.2) geoms.push(new Geom(e.x, e.y)); });
         if (enemies.length > 0) playSound('titan');
         enemies = []; updateUI(); shakeAmount = 20;
     });
@@ -2216,6 +2267,9 @@
     const btnCarsonNoltSwarm = document.getElementById('btn-carson-nolt-swarm');
     if (btnCarsonNoltSwarm) addHoldListener(btnCarsonNoltSwarm, () => { if (state === 'PLAYING') for (let i = 0; i < 5; i++) enemies.push(new Enemy(Math.random() < 0.5 ? -40 : width + 40, Math.random() * height, 19)); });
 
+    const btnSentinelSwarm = document.getElementById('btn-sentinel-swarm');
+    if (btnSentinelSwarm) addHoldListener(btnSentinelSwarm, () => { if (state === 'PLAYING') for (let i = 0; i < 5; i++) enemies.push(new Enemy(Math.random() < 0.5 ? -40 : width + 40, Math.random() * height, 20)); });
+
     const btnAlliedDrone = document.getElementById('btn-allied-drone');
     if (btnAlliedDrone) btnAlliedDrone.addEventListener('click', () => { isAlliedDrone = !isAlliedDrone; toggleAdminBtn(btnAlliedDrone, isAlliedDrone); });
 
@@ -2223,7 +2277,7 @@
     if (btnSpiralFire) btnSpiralFire.addEventListener('click', () => { isSpiralFire = !isSpiralFire; toggleAdminBtn(btnSpiralFire, isSpiralFire); });
 
     const btnJackpot = document.getElementById('btn-jackpot');
-    addHoldListener(btnJackpot, () => { score += 1000000; multiplier = Math.max(multiplier, 100); updateUI(); if (player) createExplosion(player.x, player.y, '#ffd700', 50); });
+    addHoldListener(btnJackpot, () => { score += 1000000; multiplier = Math.max(multiplier, 100); updateUI(); if (player) createHitSpark(player.x, player.y, '#ffd700', 50); });
 
     const btnHyperSpeed = document.getElementById('btn-hyperspeed');
     if (btnHyperSpeed) btnHyperSpeed.addEventListener('click', () => { isHyperSpeed = !isHyperSpeed; toggleAdminBtn(btnHyperSpeed, isHyperSpeed); });
@@ -2345,6 +2399,21 @@
         { id: '#ffb6c1', name: "Sakura Pink" },
         { id: '#32cd32', name: "Slime Sludge" },
         { id: '#ffd700', name: "Golden Ray" }
+    ];
+
+    const killEffectData = [
+        { id: 'default', name: "Classic Sparks" },
+        { id: 'implosion', name: "Void Implosion" },
+        { id: 'nova', name: "Plasma Nova" },
+        { id: 'confetti', name: "Party Confetti" },
+        { id: 'shatter', name: "Glass Shatter" }
+    ];
+
+    const deathEffectData = [
+        { id: 'default', name: "Classic Detonation" },
+        { id: 'supernova', name: "Supernova" },
+        { id: 'pixelate', name: "Retro Pixelate" },
+        { id: 'blackhole', name: "Singularity Collapse" }
     ];
 
     function drawShipGeometry(ctx, type, color) {
@@ -2590,8 +2659,102 @@
         initBulletPreviews();
     }
 
+    function renderKillSelect() {
+        const container = document.getElementById('kill-options-container');
+        if (!container) return;
+        container.innerHTML = ''; 
+
+        killEffectData.forEach(effect => {
+            const btn = document.createElement('button');
+            btn.className = 'ship-btn';
+            
+            let statusText = '';
+            let isOwned = unlockedKillEffects.includes(effect.id);
+            
+            if (isOwned) {
+                if (effect.id === selectedKillEffect) {
+                    btn.classList.add('active');
+                    statusText = 'EQUIPPED';
+                } else {
+                    statusText = 'OWNED';
+                }
+            } else {
+                btn.classList.add('locked');
+                statusText = 'CRATE EXCLUSIVE';
+            }
+
+            btn.innerHTML = `
+                <div style="font-size: 2.5rem; margin: 10px 0;">💥</div>
+                <div class="ship-name">${isOwned ? effect.name : '???'}</div>
+                <div class="ship-status">${statusText}</div>
+            `;
+            
+            btn.addEventListener('click', () => {
+                if (isOwned) {
+                    selectedKillEffect = effect.id;
+                    localStorage.setItem('spaceWarsKillEffect', selectedKillEffect);
+                    saveGameData(); 
+                    renderKillSelect();
+                } else {
+                    btn.style.backgroundColor = "rgba(255, 0, 0, 0.4)";
+                    setTimeout(() => btn.style.backgroundColor = "", 200);
+                }
+            });
+            
+            container.appendChild(btn);
+        });
+    }
+
+    function renderDeathSelect() {
+        const container = document.getElementById('death-options-container');
+        if (!container) return;
+        container.innerHTML = ''; 
+
+        deathEffectData.forEach(effect => {
+            const btn = document.createElement('button');
+            btn.className = 'ship-btn';
+            
+            let statusText = '';
+            let isOwned = unlockedDeathEffects.includes(effect.id);
+            
+            if (isOwned) {
+                if (effect.id === selectedDeathEffect) {
+                    btn.classList.add('active');
+                    statusText = 'EQUIPPED';
+                } else {
+                    statusText = 'OWNED';
+                }
+            } else {
+                btn.classList.add('locked');
+                statusText = 'CRATE EXCLUSIVE';
+            }
+
+            btn.innerHTML = `
+                <div style="font-size: 2.5rem; margin: 10px 0;">☠️</div>
+                <div class="ship-name">${isOwned ? effect.name : '???'}</div>
+                <div class="ship-status">${statusText}</div>
+            `;
+            
+            btn.addEventListener('click', () => {
+                if (isOwned) {
+                    selectedDeathEffect = effect.id;
+                    localStorage.setItem('spaceWarsDeathEffect', selectedDeathEffect);
+                    saveGameData(); 
+                    renderDeathSelect();
+                } else {
+                    btn.style.backgroundColor = "rgba(255, 0, 0, 0.4)";
+                    setTimeout(() => btn.style.backgroundColor = "", 200);
+                }
+            });
+            
+            container.appendChild(btn);
+        });
+    }
+
     renderShipSelect();
     renderBulletSelect();
+    renderKillSelect();
+    renderDeathSelect();
 
     if (shipSelectBtn) {
         shipSelectBtn.addEventListener('click', () => {
@@ -2601,6 +2764,36 @@
     }
     if (closeShipSelectBtn) closeShipSelectBtn.addEventListener('click', () => {
         if (shipSelectModal) shipSelectModal.classList.add('hidden');
+    });
+
+    if (bulletSelectBtn) {
+        bulletSelectBtn.addEventListener('click', () => {
+            renderBulletSelect();
+            if (bulletSelectModal) bulletSelectModal.classList.remove('hidden');
+        });
+    }
+    if (closeBulletSelectBtn) closeBulletSelectBtn.addEventListener('click', () => {
+        if (bulletSelectModal) bulletSelectModal.classList.add('hidden');
+    });
+
+    if (killSelectBtn) {
+        killSelectBtn.addEventListener('click', () => {
+            renderKillSelect();
+            if (killSelectModal) killSelectModal.classList.remove('hidden');
+        });
+    }
+    if (closeKillSelectBtn) closeKillSelectBtn.addEventListener('click', () => {
+        if (killSelectModal) killSelectModal.classList.add('hidden');
+    });
+
+    if (deathSelectBtn) {
+        deathSelectBtn.addEventListener('click', () => {
+            renderDeathSelect();
+            if (deathSelectModal) deathSelectModal.classList.remove('hidden');
+        });
+    }
+    if (closeDeathSelectBtn) closeDeathSelectBtn.addEventListener('click', () => {
+        if (deathSelectModal) deathSelectModal.classList.add('hidden');
     });
 
     function renderCratePreview() {
@@ -2613,11 +2806,8 @@
             const btn = document.createElement('div');
             btn.className = 'ship-btn';
             btn.style.cursor = 'default';
-            
             let isOwned = unlockedShips.includes(ship.id);
-            if (isOwned) btn.classList.add('active');
-            else btn.classList.add('locked');
-
+            if (isOwned) btn.classList.add('active'); else btn.classList.add('locked');
             btn.innerHTML = `
                 <canvas class="ship-preview" width="60" height="60" data-ship="${ship.id}"></canvas>
                 <div class="ship-name">${ship.name}</div>
@@ -2627,20 +2817,39 @@
         });
 
         bulletData.forEach(bullet => {
-            if (bullet.id === '#ffffff') return; // Default white isn't a crate drop
+            if (bullet.id === '#ffffff') return; 
             const btn = document.createElement('div');
             btn.className = 'ship-btn';
             btn.style.cursor = 'default';
-            
             let isOwned = unlockedBulletColors.includes(bullet.id);
-            if (isOwned) btn.classList.add('active');
-            else btn.classList.add('locked');
-
+            if (isOwned) btn.classList.add('active'); else btn.classList.add('locked');
             btn.innerHTML = `
                 <canvas class="bullet-preview" width="60" height="60" data-color="${bullet.id}"></canvas>
                 <div class="ship-name">${bullet.name}</div>
                 <div class="ship-status">${isOwned ? 'OWNED' : 'LOCKED'}</div>
             `;
+            container.appendChild(btn);
+        });
+
+        killEffectData.forEach(eff => {
+            if (eff.id === 'default') return; 
+            const btn = document.createElement('div');
+            btn.className = 'ship-btn';
+            btn.style.cursor = 'default';
+            let isOwned = unlockedKillEffects.includes(eff.id);
+            if (isOwned) btn.classList.add('active'); else btn.classList.add('locked');
+            btn.innerHTML = `<div style="font-size: 2.5rem; margin: 10px 0;">💥</div><div class="ship-name">${eff.name}</div><div class="ship-status">${isOwned ? 'OWNED' : 'LOCKED'}</div>`;
+            container.appendChild(btn);
+        });
+
+        deathEffectData.forEach(eff => {
+            if (eff.id === 'default') return; 
+            const btn = document.createElement('div');
+            btn.className = 'ship-btn';
+            btn.style.cursor = 'default';
+            let isOwned = unlockedDeathEffects.includes(eff.id);
+            if (isOwned) btn.classList.add('active'); else btn.classList.add('locked');
+            btn.innerHTML = `<div style="font-size: 2.5rem; margin: 10px 0;">☠️</div><div class="ship-name">${eff.name}</div><div class="ship-status">${isOwned ? 'OWNED' : 'LOCKED'}</div>`;
             container.appendChild(btn);
         });
 
@@ -2660,16 +2869,6 @@
             if (cratePreviewModal) cratePreviewModal.classList.add('hidden');
         });
     }
-
-    if (bulletSelectBtn) {
-        bulletSelectBtn.addEventListener('click', () => {
-            renderBulletSelect();
-            if (bulletSelectModal) bulletSelectModal.classList.remove('hidden');
-        });
-    }
-    if (closeBulletSelectBtn) closeBulletSelectBtn.addEventListener('click', () => {
-        if (bulletSelectModal) bulletSelectModal.classList.add('hidden');
-    });
 
     // --- CRATE OPENING SYSTEM ---
     if (openCrateBtn) {
@@ -2696,18 +2895,8 @@
                 let pool = [];
                 shipData.filter(s => s.price === -1).forEach(s => pool.push({ type: 'ship', item: s }));
                 bulletData.filter(b => b.id !== '#ffffff').forEach(b => pool.push({ type: 'bullet', item: b }));
-
-                if (pool.length === 0) {
-                    if (crateReward) {
-                        crateReward.style.color = '#ff0000';
-                        crateReward.innerText = "ALL ITEMS UNLOCKED!\nREFUNDED 150,000 PTS";
-                    }
-                    totalPoints += 150000;
-                    localStorage.setItem('spaceWarsTotalPoints', totalPoints);
-                    if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
-                    if (closeCrateBtn) closeCrateBtn.classList.remove('hidden');
-                    return;
-                }
+                killEffectData.filter(k => k.id !== 'default').forEach(k => pool.push({ type: 'kill', item: k }));
+                deathEffectData.filter(d => d.id !== 'default').forEach(d => pool.push({ type: 'death', item: d }));
 
                 let finalReward = pool[Math.floor(Math.random() * pool.length)];
 
@@ -2720,7 +2909,7 @@
                     if (typeof playSound === 'function') playSound('type');
                     
                     let randomPassItem = pool[Math.floor(Math.random() * pool.length)];
-                    let passColor = randomPassItem.type === 'ship' ? '#00ffff' : randomPassItem.item.id;
+                    let passColor = randomPassItem.type === 'ship' ? '#00ffff' : (randomPassItem.type === 'bullet' ? randomPassItem.item.id : '#ff00ff');
                     
                     if (crateAnimation) {
                         crateAnimation.innerHTML = `<div style="font-size: 2.5rem; color: ${passColor}; text-shadow: 0 0 10px ${passColor}; margin: 30px 0;">${randomPassItem.item.name}</div>`;
@@ -2743,11 +2932,15 @@
 
                     if (reward.type === 'ship') {
                         isDuplicate = unlockedShips.includes(reward.item.id);
-                    } else {
+                    } else if (reward.type === 'bullet') {
                         isDuplicate = unlockedBulletColors.includes(reward.item.id);
+                    } else if (reward.type === 'kill') {
+                        isDuplicate = unlockedKillEffects.includes(reward.item.id);
+                    } else if (reward.type === 'death') {
+                        isDuplicate = unlockedDeathEffects.includes(reward.item.id);
                     }
 
-                    let finalColor = reward.type === 'ship' ? '#00ffff' : reward.item.id;
+                    let finalColor = reward.type === 'ship' ? '#00ffff' : (reward.type === 'bullet' ? reward.item.id : '#ff00ff');
                     if (crateAnimation) {
                         crateAnimation.innerHTML = `<div style="font-size: 3.5rem; color: ${finalColor}; text-shadow: 0 0 25px ${finalColor}; margin: 25px 0; font-weight: bold; animation: pulseGlow 1s infinite;">${reward.item.name}</div>`;
                     }
@@ -2769,18 +2962,32 @@
                             localStorage.setItem('spaceWarsUnlockedShips', JSON.stringify(unlockedShips));
                             selectedShipType = reward.item.id; 
                             localStorage.setItem('spaceWarsShipType', selectedShipType);
-                        } else {
+                        } else if (reward.type === 'bullet') {
                             if (crateReward) crateReward.innerText = `NEW BULLET COLOR UNLOCKED!`;
                             unlockedBulletColors.push(reward.item.id);
                             localStorage.setItem('spaceWarsUnlockedBullets', JSON.stringify(unlockedBulletColors));
                             selectedBulletColor = reward.item.id; 
                             localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
+                        } else if (reward.type === 'kill') {
+                            if (crateReward) crateReward.innerText = `NEW KILL EFFECT UNLOCKED!`;
+                            unlockedKillEffects.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedKillEffects', JSON.stringify(unlockedKillEffects));
+                            selectedKillEffect = reward.item.id; 
+                            localStorage.setItem('spaceWarsKillEffect', selectedKillEffect);
+                        } else if (reward.type === 'death') {
+                            if (crateReward) crateReward.innerText = `NEW DEATH EFFECT UNLOCKED!`;
+                            unlockedDeathEffects.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedDeathEffects', JSON.stringify(unlockedDeathEffects));
+                            selectedDeathEffect = reward.item.id; 
+                            localStorage.setItem('spaceWarsDeathEffect', selectedDeathEffect);
                         }
                     }
 
                     saveGameData(); 
                     renderShipSelect(); 
                     renderBulletSelect();
+                    renderKillSelect();
+                    renderDeathSelect();
                     
                     if (closeCrateBtn) closeCrateBtn.classList.remove('hidden');
                 }
@@ -2882,10 +3089,10 @@
             if (gpTeleport) {
                 if (!this.prevTeleportPressed && state === 'PLAYING') {
                     const teleportDist = 200;
-                    createExplosion(this.x, this.y, this.color, 15);
+                    createHitSpark(this.x, this.y, this.color, 15);
                     this.x += Math.cos(this.angle) * teleportDist;
                     this.y += Math.sin(this.angle) * teleportDist;
-                    createExplosion(this.x, this.y, '#ffffff', 15);
+                    createHitSpark(this.x, this.y, '#ffffff', 15);
                 }
                 this.prevTeleportPressed = true;
             } else { this.prevTeleportPressed = false; }
@@ -3261,7 +3468,7 @@
             this.x = x;
             this.y = y;
             this.type = type; 
-            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : type === 15 ? 16 : type === 16 ? 22 : type === 17 ? 16 : type === 18 ? 16 : type === 19 ? 18 : 10;
+            this.baseRadius = type === 0 ? 12 : type === 1 ? 14 : type === 3 ? 20 : type === 4 ? 8 : type === 5 ? 15 : type === 7 ? 40 : type === 10 ? 18 : type === 11 ? 80 : type === 12 ? 14 : type === 13 ? 12 : type === 14 ? 14 : type === 15 ? 16 : type === 16 ? 22 : type === 17 ? 16 : type === 18 ? 16 : type === 19 ? 18 : type === 20 ? 20 : 10;
             this.radius = this.baseRadius;
             this.vx = 0;
             this.vy = 0;
@@ -3384,6 +3591,13 @@
                 this.hp = 2;
                 this.scoreValue = 850;
                 this.sweepAngle = Math.random() * Math.PI * 2;
+            } else if (type === 20) {
+                this.color = '#44ff44'; // Neon Light Green
+                this.speed = 1.5 + Math.random() * 0.5 * difficulty; 
+                this.hp = 8; // Tanky shield
+                this.scoreValue = 1100;
+                this.sentinelState = 'circling';
+                this.sentinelTimer = Math.random() * 100;
             }
         }
 
@@ -3502,11 +3716,11 @@
                 const dist = Math.sqrt(dx*dx + dy*dy) || 1;
                 
                 if (this.jumpTimer > 150) {
-                    createExplosion(this.x, this.y, this.color, 10);
+                    createHitSpark(this.x, this.y, this.color, 10);
                     const jumpDist = Math.min(120, dist - 30);
                     this.x += (dx / dist) * jumpDist;
                     this.y += (dy / dist) * jumpDist;
-                    createExplosion(this.x, this.y, '#ffffff', 10);
+                    createHitSpark(this.x, this.y, '#ffffff', 10);
                     this.jumpTimer = 0;
                 } else {
                     this.vx = (dx / dist) * this.speed;
@@ -3781,6 +3995,53 @@
                 this.vx = forwardX + swayX;
                 this.vy = forwardY + swayY;
                 this.angle += 0.2 * timeScale; // Spin wildly
+            } else if (this.type === 20) {
+                // The Sentinel: Circles at a distance, then lunges
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                const distSq = dx*dx + dy*dy;
+                const dist = Math.sqrt(distSq) || 1;
+                
+                this.sentinelTimer += timeScale;
+
+                if (this.sentinelState === 'circling') {
+                    const dirX = dx / dist;
+                    const dirY = dy / dist;
+                    const perpX = -dirY;
+                    const perpY = dirX;
+
+                    if (dist > 250) {
+                        // Approach if too far
+                        this.vx = dirX * this.speed;
+                        this.vy = dirY * this.speed;
+                    } else {
+                        // Circle
+                        this.vx = perpX * (this.speed * 1.5);
+                        this.vy = perpY * (this.speed * 1.5);
+                    }
+                    this.angle = Math.atan2(dy, dx); // always face player
+
+                    if (this.sentinelTimer > 150) {
+                        this.sentinelState = 'lunging';
+                        this.sentinelTimer = 0;
+                        this.vx = dirX * (this.speed * 4.5);
+                        this.vy = dirY * (this.speed * 4.5);
+                        if (settingHighParticles) {
+                            createHitSpark(this.x, this.y, this.color, 5);
+                        }
+                    }
+                } else if (this.sentinelState === 'lunging') {
+                    if (this.sentinelTimer > 40) {
+                        this.sentinelState = 'circling';
+                        this.sentinelTimer = 0;
+                    }
+                    // Leave trail while lunging
+                    if (settingHighParticles && Math.random() > 0.5) {
+                        let p = new Particle(this.x, this.y, this.color, 0.2);
+                        p.size = 2;
+                        particles.push(p);
+                    }
+                }
             }
 
             if (player && isRepellent) {
@@ -3964,6 +4225,19 @@
                     else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
                 }
                 if (this.hp < 2) ctx.setLineDash([2, 2]);
+            } else if (this.type === 20) {
+                for (let i = 0; i < 8; i++) {
+                    const a = (i * Math.PI) / 4;
+                    if (i === 0) ctx.moveTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                    else ctx.lineTo(Math.cos(a) * this.radius, Math.sin(a) * this.radius);
+                }
+                ctx.closePath();
+                ctx.rect(-this.radius/2, -this.radius/2, this.radius, this.radius);
+                if (this.sentinelState === 'lunging') {
+                    ctx.fillStyle = 'rgba(68, 255, 68, 0.3)';
+                    ctx.fill();
+                }
+                if (this.hp < 4) ctx.setLineDash([3, 3]);
             }
             
             if (this.type !== 7 && this.type !== 11) {
@@ -4018,6 +4292,8 @@
             this.life = 1.0;
             this.decay = Math.random() * 0.01 + 0.005; 
             this.size = Math.random() * 3 + 1.5; 
+            this.shape = 'line'; // 'line' or 'square'
+            this.gravity = 0;
         }
 
         update(timeScale = 1.0) {
@@ -4032,6 +4308,10 @@
                 }
             }
 
+            if (this.gravity) {
+                this.vy += this.gravity * timeScale;
+            }
+
             this.x += this.vx * timeScale;
             this.y += this.vy * timeScale;
             this.vx *= Math.pow(0.95, timeScale); 
@@ -4042,19 +4322,42 @@
         draw(ctx) {
             ctx.save();
             ctx.globalAlpha = Math.max(0, this.life);
-            ctx.strokeStyle = this.color;
             ctx.fillStyle = this.color;
-            ctx.lineWidth = this.size;
-
-            ctx.beginPath();
-            ctx.moveTo(this.x, this.y);
-            ctx.lineTo(this.x - this.vx * 1.5, this.y - this.vy * 1.5);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.8, 0, Math.PI * 2);
-            ctx.fill();
             
+            if (this.shape === 'square') {
+                ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+            } else {
+                ctx.strokeStyle = this.color;
+                ctx.lineWidth = this.size;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x - this.vx * 1.5, this.y - this.vy * 1.5);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 0.8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+    }
+
+    class Ring {
+        constructor(x, y, color, growthRate, maxRadius) {
+            this.x = x; this.y = y; this.color = color;
+            this.radius = 1; this.growthRate = growthRate; this.maxRadius = maxRadius;
+            this.life = 1.0;
+        }
+        update(timeScale) {
+            this.radius += this.growthRate * timeScale;
+            this.life -= (this.growthRate / this.maxRadius) * timeScale;
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, this.life);
+            ctx.strokeStyle = this.color;
+            ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2); ctx.stroke();
             ctx.restore();
         }
     }
@@ -4117,10 +4420,79 @@
 
     // --- GAME LOGIC ---
 
-    function createExplosion(x, y, color, amount) {
+    function createHitSpark(x, y, color, amount) {
         const actualAmount = settingHighParticles ? amount : Math.ceil(amount / 3);
         for (let i = 0; i < actualAmount; i++) {
             particles.push(new Particle(x, y, color));
+        }
+    }
+
+    function createKillEffect(x, y, color, amount) {
+        const actualAmount = settingHighParticles ? amount : Math.ceil(amount / 3);
+        
+        if (selectedKillEffect === 'default') {
+            for (let i=0; i<actualAmount; i++) particles.push(new Particle(x, y, color));
+        } else if (selectedKillEffect === 'nova') {
+            rings.push(new Ring(x, y, color, 8, 80));
+            for (let i=0; i<actualAmount/2; i++) particles.push(new Particle(x, y, color, 0.5));
+        } else if (selectedKillEffect === 'confetti') {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            for (let i=0; i<actualAmount; i++) {
+                let p = new Particle(x, y, colors[Math.floor(Math.random()*colors.length)], 1.5);
+                p.gravity = 0.2;
+                p.shape = 'square';
+                particles.push(p);
+            }
+        } else if (selectedKillEffect === 'shatter') {
+            for (let i=0; i<actualAmount; i++) {
+                let p = new Particle(x, y, '#ffffff', 2.5);
+                p.decay = 0.05;
+                particles.push(p);
+            }
+        } else if (selectedKillEffect === 'implosion') {
+            for (let i=0; i<actualAmount; i++) {
+                let angle = Math.random() * Math.PI * 2;
+                let dist = 60 + Math.random() * 40;
+                let px = x + Math.cos(angle) * dist;
+                let py = y + Math.sin(angle) * dist;
+                let p = new Particle(px, py, color, 0.1);
+                let speed = Math.random() * 5 + 3;
+                p.vx = -Math.cos(angle) * speed;
+                p.vy = -Math.sin(angle) * speed;
+                particles.push(p);
+            }
+        }
+    }
+
+    function createDeathEffect(x, y, color) {
+        let amount = 50;
+        
+        if (selectedDeathEffect === 'default') {
+            createHitSpark(x, y, color, amount);
+        } else if (selectedDeathEffect === 'supernova') {
+            rings.push(new Ring(x, y, '#ffffff', 15, 300));
+            rings.push(new Ring(x, y, color, 10, 250));
+            createHitSpark(x, y, color, amount * 2);
+        } else if (selectedDeathEffect === 'pixelate') {
+            for (let i=0; i<amount*2; i++) {
+                let p = new Particle(x, y, color, 1.5);
+                p.shape = 'square';
+                p.size = Math.random() * 8 + 4;
+                p.decay = 0.01;
+                particles.push(p);
+            }
+        } else if (selectedDeathEffect === 'blackhole') {
+            for (let i=0; i<amount*2; i++) {
+                let angle = Math.random() * Math.PI * 2;
+                let dist = 150 + Math.random() * 100;
+                let px = x + Math.cos(angle) * dist;
+                let py = y + Math.sin(angle) * dist;
+                let p = new Particle(px, py, color, 0.1);
+                let speed = Math.random() * 8 + 4;
+                p.vx = -Math.cos(angle) * speed;
+                p.vy = -Math.sin(angle) * speed;
+                particles.push(p);
+            }
         }
     }
 
@@ -4144,6 +4516,7 @@
         else if (difficulty > 1.5 && rand > 0.90) type = 13; 
         else if (difficulty > 2.5 && rand > 0.86) type = 6; 
         else if (difficulty > 2.7 && rand > 0.84) type = 19; 
+        else if (difficulty > 2.8 && rand > 0.83) type = 20; 
         else if (difficulty > 2.6 && rand > 0.82) type = 16; 
         else if (difficulty > 2.5 && rand > 0.81) type = 18; 
         else if (difficulty > 2.4 && rand > 0.80) type = 17; 
@@ -4174,7 +4547,7 @@
         shakeAmount = 20;
 
         enemies.forEach(e => {
-            createExplosion(e.x, e.y, e.color, 15);
+            createKillEffect(e.x, e.y, e.color, 15);
         });
         if (enemies.length > 0) playSound('titan'); 
         enemies = [];
@@ -4182,7 +4555,7 @@
     }
 
     function playerDeath() {
-        createExplosion(player.x, player.y, player.color, 50);
+        createDeathEffect(player.x, player.y, player.color);
         playSound('player');
         shakeAmount = 30;
         
@@ -4280,7 +4653,7 @@
                         e1.hp -= 0.5;
                         e2.hp -= 0.5;
                         if (settingHighParticles && Math.random() > 0.8) {
-                            createExplosion(e1.x + dx/2, e1.y + dy/2, '#ffffff', 1);
+                            createHitSpark(e1.x + dx/2, e1.y + dy/2, '#ffffff', 1);
                         }
                     }
                 }
@@ -4301,10 +4674,10 @@
                 if (distSq < radSum * radSum) {
                     hit = true;
                     e.hp -= (isInstaKill ? 100 : 1);
-                    createExplosion(b.x, b.y, '#fff', 3); 
+                    createHitSpark(b.x, b.y, '#fff', 3); 
 
                     if (isExplosiveBullets || b.isMine) {
-                        createExplosion(b.x, b.y, '#ff8800', 25); 
+                        createHitSpark(b.x, b.y, '#ff8800', 25); 
                         for (let k = 0; k < enemies.length; k++) {
                             const ek = enemies[k];
                             if (ek !== e) {
@@ -4361,7 +4734,7 @@
         for (let j = enemies.length - 1; j >= 0; j--) {
             const e = enemies[j];
             if (e.hp <= 0) {
-                createExplosion(e.x, e.y, e.color, (e.type === 11 ? 200 : e.type === 7 ? 50 : e.type === 13 ? 40 : 15));
+                createKillEffect(e.x, e.y, e.color, (e.type === 11 ? 200 : e.type === 7 ? 50 : e.type === 13 ? 40 : 15));
                 playSound(e.type === 11 ? 'titan' : 'enemy');
                 score += e.scoreValue * multiplier;
                 
@@ -4433,7 +4806,7 @@
                     if (geomCount >= required) {
                         multiplier++;
                         geomCount = 0;
-                        createExplosion(player.x, player.y, '#ff00ff', 20); 
+                        createHitSpark(player.x, player.y, '#ff00ff', 20); 
                     }
                     updateUI();
                 }
@@ -4467,6 +4840,7 @@
         bullets = [];
         particles = [];
         geoms = [];
+        rings = [];
 
         if (overlay) overlay.classList.add('hidden');
         if (uiLayer) uiLayer.classList.remove('hidden');
@@ -4525,6 +4899,7 @@
             bullets = [];
             particles = [];
             geoms = [];
+            rings = [];
         });
     }
 
@@ -4573,6 +4948,9 @@
             const creditsIsHidden = creditsModal && creditsModal.classList.contains('hidden');
             const shipSelectIsHidden = shipSelectModal && shipSelectModal.classList.contains('hidden');
             const cratePreviewIsHidden = cratePreviewModal && cratePreviewModal.classList.contains('hidden');
+            const killSelectIsHidden = killSelectModal && killSelectModal.classList.contains('hidden');
+            const deathSelectIsHidden = deathSelectModal && deathSelectModal.classList.contains('hidden');
+            const bulletSelectIsHidden = bulletSelectModal && bulletSelectModal.classList.contains('hidden');
 
             if ((state === 'MENU' || state === 'GAMEOVER') && 
                 authIsHidden && 
@@ -4580,7 +4958,10 @@
                 leaderboardIsHidden && 
                 creditsIsHidden &&
                 shipSelectIsHidden &&
-                cratePreviewIsHidden) {
+                cratePreviewIsHidden &&
+                killSelectIsHidden &&
+                deathSelectIsHidden &&
+                bulletSelectIsHidden) {
                 if (startBtn) startBtn.click();
             }
         }
@@ -4751,6 +5132,14 @@
             }
         }
         
+        for (let i = rings.length - 1; i >= 0; i--) {
+            rings[i].update(globalTimeScale);
+            if (rings[i].life <= 0) {
+                rings[i] = rings[rings.length - 1];
+                rings.pop();
+            }
+        }
+        
         for (let i = geoms.length - 1; i >= 0; i--) {
             geoms[i].update(globalTimeScale);
             if (geoms[i].life <= 0) {
@@ -4760,6 +5149,7 @@
         }
 
         geoms.forEach(g => g.draw(ctx));
+        rings.forEach(r => r.draw(ctx));
         particles.forEach(p => p.draw(ctx));
         bullets.forEach(b => b.draw(ctx));
         enemies.forEach(e => e.draw(ctx));
@@ -4780,7 +5170,6 @@
         if (state === 'PAUSED') {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
             ctx.fillRect(0, 0, width, height);
-            // Redundant canvas text removed to let the HTML overlay handle the UI cleanly
         }
     }
 
