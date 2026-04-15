@@ -703,6 +703,7 @@
             <h3>LATEST UPDATES</h3>
             <div class="log-scroll-container">
                 <ul>
+                    <li><span class="log-highlight">Feature:</span> Added Crate Slot Machine Animation!</li>
                     <li><span class="log-highlight">System:</span> Added Offline Mode Leaderboard!</li>
                     <li><span class="log-highlight">Feature:</span> Crates now give 50% refund on duplicates!</li>
                     <li><span class="log-highlight">Feature:</span> Mystery Crate System is BACK!</li>
@@ -2682,67 +2683,98 @@
                 if (closeCrateBtn) closeCrateBtn.classList.add('hidden');
                 
                 if (crateAnimation) {
-                    crateAnimation.style.animation = "shake 0.15s infinite";
+                    crateAnimation.style.animation = "none";
                     crateAnimation.innerHTML = "📦";
                 }
                 if (crateReward) {
                     crateReward.style.color = '#fff';
-                    crateReward.innerText = "OPENING CRATE...";
+                    crateReward.innerText = "ROLLING...";
                 }
 
                 if (typeof initAudio === 'function') initAudio();
-                if (typeof playSound === 'function') playSound('type');
 
                 let pool = [];
                 shipData.filter(s => s.price === -1).forEach(s => pool.push({ type: 'ship', item: s }));
                 bulletData.filter(b => b.id !== '#ffffff').forEach(b => pool.push({ type: 'bullet', item: b }));
 
-                setTimeout(() => {
-                    if (crateAnimation) crateAnimation.style.animation = "none";
+                if (pool.length === 0) {
+                    if (crateReward) {
+                        crateReward.style.color = '#ff0000';
+                        crateReward.innerText = "ALL ITEMS UNLOCKED!\nREFUNDED 150,000 PTS";
+                    }
+                    totalPoints += 150000;
+                    localStorage.setItem('spaceWarsTotalPoints', totalPoints);
+                    if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
+                    if (closeCrateBtn) closeCrateBtn.classList.remove('hidden');
+                    return;
+                }
+
+                let finalReward = pool[Math.floor(Math.random() * pool.length)];
+
+                let rollTicks = 0;
+                const maxTicks = 30; // Number of flashes before stopping
+                let currentDelay = 40; // Starting speed (fast)
+
+                function rollTick() {
+                    rollTicks++;
+                    if (typeof playSound === 'function') playSound('type');
+                    
+                    let randomPassItem = pool[Math.floor(Math.random() * pool.length)];
+                    let passColor = randomPassItem.type === 'ship' ? '#00ffff' : randomPassItem.item.id;
+                    
+                    if (crateAnimation) {
+                        crateAnimation.innerHTML = `<div style="font-size: 2.5rem; color: ${passColor}; text-shadow: 0 0 10px ${passColor}; margin: 30px 0;">${randomPassItem.item.name}</div>`;
+                    }
+
+                    if (rollTicks < maxTicks) {
+                        currentDelay *= 1.08; // Gradually slow down
+                        setTimeout(rollTick, currentDelay);
+                    } else {
+                        finishRoll(finalReward);
+                    }
+                }
+                
+                setTimeout(rollTick, currentDelay);
+
+                function finishRoll(reward) {
                     if (typeof playSound === 'function') playSound('titan'); 
 
-                    if (pool.length === 0) {
+                    let isDuplicate = false;
+
+                    if (reward.type === 'ship') {
+                        isDuplicate = unlockedShips.includes(reward.item.id);
+                    } else {
+                        isDuplicate = unlockedBulletColors.includes(reward.item.id);
+                    }
+
+                    let finalColor = reward.type === 'ship' ? '#00ffff' : reward.item.id;
+                    if (crateAnimation) {
+                        crateAnimation.innerHTML = `<div style="font-size: 3.5rem; color: ${finalColor}; text-shadow: 0 0 25px ${finalColor}; margin: 25px 0; font-weight: bold; animation: pulseGlow 1s infinite;">${reward.item.name}</div>`;
+                    }
+
+                    if (isDuplicate) {
                         if (crateReward) {
-                            crateReward.style.color = '#ff0000';
-                            crateReward.innerText = "ALL ITEMS UNLOCKED!\nREFUNDED 150,000 PTS";
+                            crateReward.style.color = '#ffcc00';
+                            crateReward.innerText = `DUPLICATE REWARD:\nREFUNDED 75,000 PTS!`;
                         }
-                        totalPoints += 150000;
+                        totalPoints += 75000;
                         localStorage.setItem('spaceWarsTotalPoints', totalPoints);
                         if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
                     } else {
-                        let reward = pool[Math.floor(Math.random() * pool.length)];
-                        let isDuplicate = false;
-
+                        if (crateReward) crateReward.style.color = '#00ffff';
+                        
                         if (reward.type === 'ship') {
-                            isDuplicate = unlockedShips.includes(reward.item.id);
+                            if (crateReward) crateReward.innerText = `NEW SHIP UNLOCKED!`;
+                            unlockedShips.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedShips', JSON.stringify(unlockedShips));
+                            selectedShipType = reward.item.id; 
+                            localStorage.setItem('spaceWarsShipType', selectedShipType);
                         } else {
-                            isDuplicate = unlockedBulletColors.includes(reward.item.id);
-                        }
-
-                        if (isDuplicate) {
-                            if (crateReward) {
-                                crateReward.style.color = '#ffcc00';
-                                crateReward.innerText = `DUPLICATE REWARD:\n${reward.item.name}\nREFUNDED 75,000 PTS!`;
-                            }
-                            totalPoints += 75000;
-                            localStorage.setItem('spaceWarsTotalPoints', totalPoints);
-                            if (menuTotalPointsEl) menuTotalPointsEl.innerText = `Balance: ${totalPoints.toLocaleString()} PTS`;
-                        } else {
-                            if (crateReward) crateReward.style.color = '#00ffff';
-                            
-                            if (reward.type === 'ship') {
-                                if (crateReward) crateReward.innerText = `NEW SHIP UNLOCKED:\n${reward.item.name}`;
-                                unlockedShips.push(reward.item.id);
-                                localStorage.setItem('spaceWarsUnlockedShips', JSON.stringify(unlockedShips));
-                                selectedShipType = reward.item.id; 
-                                localStorage.setItem('spaceWarsShipType', selectedShipType);
-                            } else {
-                                if (crateReward) crateReward.innerText = `NEW BULLET COLOR UNLOCKED:\n${reward.item.name}`;
-                                unlockedBulletColors.push(reward.item.id);
-                                localStorage.setItem('spaceWarsUnlockedBullets', JSON.stringify(unlockedBulletColors));
-                                selectedBulletColor = reward.item.id; 
-                                localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
-                            }
+                            if (crateReward) crateReward.innerText = `NEW BULLET COLOR UNLOCKED!`;
+                            unlockedBulletColors.push(reward.item.id);
+                            localStorage.setItem('spaceWarsUnlockedBullets', JSON.stringify(unlockedBulletColors));
+                            selectedBulletColor = reward.item.id; 
+                            localStorage.setItem('spaceWarsBulletColor', selectedBulletColor);
                         }
                     }
 
@@ -2751,7 +2783,7 @@
                     renderBulletSelect();
                     
                     if (closeCrateBtn) closeCrateBtn.classList.remove('hidden');
-                }, 1800);
+                }
             } else {
                 openCrateBtn.style.backgroundColor = "rgba(255, 0, 0, 0.4)";
                 setTimeout(() => openCrateBtn.style.backgroundColor = "", 200);
