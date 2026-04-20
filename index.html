@@ -5181,42 +5181,26 @@
         const cloakBtn = document.getElementById('cloak-btn');
         if (!cloakBtn) return;
 
-        let cloaked = false;
-        const originalTitle = document.title;
-
-        // Build a tiny blank favicon as a data URI (1×1 transparent PNG)
-        const blankFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
-
-        function getFaviconEl() {
-            let link = document.querySelector("link[rel~='icon']");
-            if (!link) {
-                link = document.createElement('link');
-                link.rel = 'icon';
-                document.head.appendChild(link);
-            }
-            return link;
-        }
-
-        const originalFavicon = getFaviconEl().href;
-
         cloakBtn.addEventListener('click', function() {
-            cloaked = !cloaked;
-            const favicon = getFaviconEl();
-            if (cloaked) {
-                document.title = '';
-                favicon.href = blankFavicon;
-                cloakBtn.textContent = '🔓 UNCLOAK TAB';
-                cloakBtn.style.borderColor = '#00ff88';
-                cloakBtn.style.color = '#00ff88';
-                cloakBtn.style.boxShadow = '0 0 10px rgba(0,255,136,0.4)';
-            } else {
-                document.title = originalTitle;
-                favicon.href = originalFavicon;
-                cloakBtn.textContent = '🕵️ CLOAK TAB';
-                cloakBtn.style.borderColor = '#888';
-                cloakBtn.style.color = '#888';
-                cloakBtn.style.boxShadow = '0 0 10px rgba(136,136,136,0.3)';
+            // Open a genuine about:blank window
+            const w = window.open('about:blank', '_blank');
+            if (!w) {
+                alert('Pop-up blocked! Please allow pop-ups for this page, then try again.');
+                return;
             }
+
+            // Inject a full-screen iframe that loads this exact page
+            w.document.open();
+            w.document.write(
+                '<!DOCTYPE html><html><head>' +
+                '<title></title>' +
+                '<style>*{margin:0;padding:0}html,body{width:100%;height:100%;overflow:hidden}' +
+                'iframe{width:100vw;height:100vh;border:none;display:block}</style>' +
+                '</head><body>' +
+                '<iframe src="' + window.location.href + '" allowfullscreen></iframe>' +
+                '</body></html>'
+            );
+            w.document.close();
         });
     })();
     // ────────────────────────────────────────────────────────────────────────
