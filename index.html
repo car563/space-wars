@@ -764,6 +764,7 @@
                     <button id="settings-btn" style="margin: 0; width: 100%;">SETTINGS</button>
                 </div>
                 <button id="credits-btn" style="width: 100%;">CREDITS</button>
+                <button id="cloak-btn" style="width: 100%; border-color: #888; color: #888; box-shadow: 0 0 10px rgba(136,136,136,0.3); font-size: 0.9rem;">🕵️ CLOAK TAB</button>
             </div>
             
             <div id="cheat-section" style="margin-top: 40px; display: flex; align-items: center;">
@@ -5174,6 +5175,51 @@
     }
 
     loop();
+
+    // ── Tab Cloak ──────────────────────────────────────────────────────────
+    (function() {
+        const cloakBtn = document.getElementById('cloak-btn');
+        if (!cloakBtn) return;
+
+        let cloaked = false;
+        const originalTitle = document.title;
+
+        // Build a tiny blank favicon as a data URI (1×1 transparent PNG)
+        const blankFavicon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+
+        function getFaviconEl() {
+            let link = document.querySelector("link[rel~='icon']");
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = 'icon';
+                document.head.appendChild(link);
+            }
+            return link;
+        }
+
+        const originalFavicon = getFaviconEl().href;
+
+        cloakBtn.addEventListener('click', function() {
+            cloaked = !cloaked;
+            const favicon = getFaviconEl();
+            if (cloaked) {
+                document.title = '';
+                favicon.href = blankFavicon;
+                cloakBtn.textContent = '🔓 UNCLOAK TAB';
+                cloakBtn.style.borderColor = '#00ff88';
+                cloakBtn.style.color = '#00ff88';
+                cloakBtn.style.boxShadow = '0 0 10px rgba(0,255,136,0.4)';
+            } else {
+                document.title = originalTitle;
+                favicon.href = originalFavicon;
+                cloakBtn.textContent = '🕵️ CLOAK TAB';
+                cloakBtn.style.borderColor = '#888';
+                cloakBtn.style.color = '#888';
+                cloakBtn.style.boxShadow = '0 0 10px rgba(136,136,136,0.3)';
+            }
+        });
+    })();
+    // ────────────────────────────────────────────────────────────────────────
 
 </script>
 </body>
